@@ -1,0 +1,96 @@
+{
+    "version": "0.0.1",
+    "created_on": "2022-08-07T13:43:21Z",
+    "updated_on": "2022-08-07T13:43:21Z",
+    "organisation": "Meerkat Manor",
+
+    "name": "Web site",
+    "owner": {
+        "email": "meerkat@merebox.com",
+        "web": "https://www.merebox.com",
+        "matrix":"@devops:merebox.com"
+    },
+    "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/overview.md",
+
+    "repository": {
+        "guide": "https://github.com/meerkat-manor/rediOps",
+        "source-engine": "Git", 
+        "source": "https://github.com/meerkat-manor/rediOps.git",
+        "artefact": ""
+    },
+
+    "dependency": {
+        "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/dependency.md",
+        "apis": [],
+        "tools": []
+    },
+
+    "build": {
+        "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/build.md",
+        "engine": "JENKINS"
+    },
+
+
+    "test": {
+        "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/test.md",
+        "engine": "UNITTEST"
+    },
+
+    "api" : [
+        {
+            "engine": "GIT",
+            "url": "/specification/rediops.json"
+        },
+        {
+            "engine": "GIT",
+            "url": "/specification/rediops.yaml"
+        },
+        {
+            "engine": "REST",
+            "url": "/api/v0/docs/rediops.json"
+        }
+    ],
+
+    "health": {
+        "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/health.md",
+        "api" :[
+            {"url": "/health", "status": 200, "response": ""}
+        ]
+    },
+
+    "install": {
+        "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/install.md",
+        "engine": "COMMAND",
+        "playbook": "",
+        "commands": {
+            "pre": [
+            ],
+            "script": "/deploy/install.sh",
+            "post": [
+            ]
+        }
+    },
+
+    "refresh": {
+        "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/refresh.md",
+        "engine": "COMMAND",
+        "playbook": "",
+        "commands": {
+            "pre": [],
+            "script": "/deploy/refresh.sh",
+            "post": []
+        }
+    },
+
+    "uninstall": {
+        "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/uninstall.md",
+        "engine": "ANSIBLE",
+        "playbook": "",
+        "commands": {
+            "pre": [],
+            "script": "/deploy/decommission.sh",
+            "post": []
+        }
+    }
+
+}
