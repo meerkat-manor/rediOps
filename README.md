@@ -7,7 +7,7 @@ The information resides with the code in the code repository, commonly Git, and 
 
 RediOps takes the lead from the the **.well-known** folder approach used in web pages for source.  
 That is the creation of a folder named ".well-known" and to create a file by the name of 
-**"devops.json"** within the folder. This will allow tools to retrieve the file if it exists
+**"devops.json"** within the folder in source. This will allow tools to retrieve the file if it exists
 and to use the information for activities such as:
 
 * build
