@@ -2,7 +2,17 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Rediscover DevOps configuration",
-        "version": "v1"
+        "version": "v1",
+        "description": "This document describes the specification of the \nproposed file **.well-known/devops.json** that can \nbe used in the DevOps CI/cD as identifier for\ninformation required by the tools.\n\nBy using the .well-known location, assumptions are\nreduced if not eliminated by the automation tools.\n\nAutomation tools can also validate the information during \nsource commit to confirm the engineers are providing the necessary \ninformation and that it is valid.",
+        "contact": {
+            "name": "Meerkat",
+            "url": "https://github.com/meerkat-manor/rediOps",
+            "email": "meerkat@merebox.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        }
     },
     "paths": {
         "/.well-known/devops": {
@@ -423,9 +433,186 @@
                         "description": ""
                     }
                 },
+                "security": [
+                    {
+
+                    }
+                ],
                 "summary": "Fetch the DevOps information",
                 "description": "Commonly the DevOps information is not fetched using a REST API but is actually the JSON file stored the root **.well-known** directory as the file name **devops.json**\n\nIf so required there can be a supporting REST API to fetch the contents, but that is not the primary intent."
             }
+        },
+        "/devops": {
+            "get": {
+                "responses": {
+                    "404": {
+                        "description": "No match for resource or no resources exist"
+                    },
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/devops"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Listing matching resources"
+                    }
+                },
+                "security": [
+                    {
+
+                    }
+                ]
+            },
+            "parameters": [
+                {
+                    "name": "id",
+                    "description": "List resources with matching asset id",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "in": "query"
+                },
+                {
+                    "name": "name",
+                    "description": "List resources matchin on name",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "in": "query"
+                }
+            ]
+        },
+        "/devops/{id}": {
+            "summary": "Operate on the identified resources",
+            "get": {
+                "parameters": [
+                    {
+                        "name": "id",
+                        "description": "Identifier for the DevOps resource.\n\nThe identifier is the Asset Id which is asumed to be unique for the catalogue servce.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/devops"
+                                }
+                            }
+                        },
+                        "description": "The DevOps record was found"
+                    },
+                    "404": {
+                        "description": "The required Devops recor with the requested identity wasnot found."
+                    }
+                },
+                "security": [
+                    {
+
+                    }
+                ],
+                "summary": "Fetch the Devops resource",
+                "description": "For web servers that provide a DevOps catalogue,this service\nfetches the details for the requested DevOps identity"
+            },
+            "post": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/devops"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "description": "Identifer of the DevOps resource.\n\nThis must match the asset identifier and is unique across all DevOps.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/devops"
+                                }
+                            }
+                        },
+                        "description": "The updated record is returned to the caller\non succssful update"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuthentication": [
+                        ]
+                    }
+                ],
+                "summary": "Update the DevOps resource",
+                "description": "This service is for servers providing a catalogue service\nfor DevOps information.  The original Git details are not required to\nbe updated.\n\nYou could create a capability where this POST is used to \nupdate the source details and commit those changes."
+            },
+            "delete": {
+                "parameters": [
+                    {
+                        "name": "id",
+                        "description": "Resource identifier for resource to be deleted",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resource successfully deleted."
+                    },
+                    "404": {
+                        "description": "Resource not fouund"
+                    },
+                    "401": {
+                        "description": "Not authorised to delete resource"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuthentication": [
+                        ]
+                    }
+                ]
+            },
+            "parameters": [
+                {
+                    "examples": {
+                        "Sample": {
+                            "value": "\"AI7842389-01\""
+                        }
+                    },
+                    "name": "id",
+                    "description": "Resource identifier",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "in": "path",
+                    "required": true
+                }
+            ]
         }
     },
     "components": {
@@ -522,22 +709,32 @@
             },
             "owner-contact": {
                 "title": "Root Type for asset-owner",
-                "description": "",
+                "description": "The name and /or contact detals of the DevOps owner.\n\nThe owner can be a single person or a team.  It is preferale thati t is more\ngranualr then the organisation.\n\nIf you have a CMDB catalgue then the entry here should match the details on\nthe CMDB if you choose to include them here.\n\nThe contact details do not include a phone / mobile / cell number on purpose\nas this information is either know by the reader for the person / team or\ncan be obtained from an organisations internal directory.\n\nAutomated tools are unlikely to benefit from having access to a phone number, but they\ncan send emails or post messages to Slack.",
                 "type": "object",
                 "properties": {
                     "email": {
+                        "description": "The email adress of the owner.\n\nThe email address could be a distribution list.",
+                        "minLength": 6,
+                        "pattern": "([-!#-'*+/-9=?A-Z^-~]+(\\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \\t]|(\\\\[\\t -~]))+\")@([0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)*|\\[((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|IPv6:((((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){6}|::((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){5}|[0-9A-Fa-f]{0,4}::((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){4}|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):)?(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){3}|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){0,2}(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){2}|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){0,3}(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){0,4}(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::)((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3})|(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3})|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){0,5}(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3})|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){0,6}(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::)|(?!IPv6:)[0-9A-Za-z-]*[0-9A-Za-z]:[!-Z^-~]+)])",
                         "type": "string"
                     },
                     "web": {
+                        "description": "A web page URL for the owner.\n\nThe web page could refer to a team page.",
                         "type": "string"
                     },
                     "slack": {
+                        "description": "Slack address of the owner.",
                         "type": "string"
                     },
                     "twitter": {
                         "type": "string"
                     },
                     "matrix": {
+                        "description": "The matrrix IM identfier of the owner",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "The name of the owner.\n\nThis may be persons or teams name.",
                         "type": "string"
                     }
                 },
@@ -573,33 +770,48 @@
             "devops": {
                 "title": "Root Type for devops",
                 "description": "Information that supports DevOps activity.",
+                "required": [
+                    "version",
+                    "name"
+                ],
                 "type": "object",
                 "properties": {
                     "version": {
-                        "type": "string"
+                        "description": "Specification version\n\nMajor versions may not be compatible with minor versions.",
+                        "type": "string",
+                        "example": "0.1.34"
                     },
                     "created_on": {
                         "format": "date-time",
-                        "type": "string"
+                        "description": "Date and time this content was first created.\n\nThe formatt is in ISO8061 and includes the date and time",
+                        "type": "string",
+                        "example": "2022-05-29T13:44:11.000Z"
                     },
                     "updated_on": {
                         "format": "date-time",
-                        "type": "string"
+                        "description": "Date this content was last updated.\n\nIf retrieved from source version control (e.g. Git) then the value here should match the \nGit commit date for file.\n\nThe formatt is in ISO8061 and includes the date and time",
+                        "type": "string",
+                        "example": "2022-07-25T17:22:11.00Z"
                     },
                     "organisation": {
+                        "description": "The name of the organisation that owns the implemened resouurce.\n\nThe owner may not be netllectual Property / Copyright owner as the\ngeneral detaisl about the resource may be in teh public domain or\nthis organisation has licensed the rightsto use the resource\nand its secification.",
                         "type": "string"
                     },
                     "name": {
-                        "type": "string"
+                        "description": "A name for the resource this document covers.\n\nIf there is a CMDB catalogue then the name here should match the\nname on the CMDB.",
+                        "maxLength": 100,
+                        "minLength": 5,
+                        "type": "string",
+                        "example": "Ecommeerce web site"
                     },
                     "asset": {
                         "$ref": "#/components/schemas/asset-id",
-                        "description": "Asset information that is intended to be related to a Computer Management Database (CMDB).\n\nBy linking to the asset in an CMDB further information can be retrieved.\n\nIf the CMDB link exists then it should be considered the authorative source where the same information exists in this definition.\n\nIf you wish the DevOps workflow to control the information and be versioned with Git, then you can use this information to push updates to the CMDB.  Just include processing of the __./well-known/devops.json__ into your deployment pipeline and post to the CMDB the updates.",
+                        "description": "Rsource information that is intended to be related to a Computer Management Database (CMDB).\n\nBy linking to the asset in an CMDB, further information can be retrieved.\n\nIf the CMDB link exists then it should be considered the authorative source where the same information exists in this definition.\n\nIf you wish the DevOps workflow to control the information and be versioned with Git, then you can use this information to push updates to the CMDB.  Just include processing of the __./well-known/devops.json__ into your deployment pipeline and post to the CMDB the updates.",
                         "example": "{\r\n    \"id\": \"AID07828923\",\r\n    \"name\": \"devops\",\r\n    \"url\": \"\"\r\n}"
                     },
                     "owner": {
                         "$ref": "#/components/schemas/owner-contact",
-                        "description": "Contact information for the asset / artifact being described.\n\nIf the asset information is provided from a central source then this content should match.",
+                        "description": "Contact information for the resource being described.\n\nIf the resorce information is provided from a central source\nsuch as a CMDB then this content should match.",
                         "properties": {
                             "email": {
                                 "type": "string"
@@ -619,6 +831,7 @@
                         }
                     },
                     "guide": {
+                        "description": "A link to documentation for the resource being \ndescribed by this document.\n\nThe preferece is that the links is in the format of a HTTPS URL to a \nhuman readable web page.",
                         "type": "string"
                     },
                     "repository": {
@@ -668,7 +881,8 @@
                         }
                     },
                     "build": {
-                        "type": "object",
+                        "$ref": "#/components/schemas/activity",
+                        "description": "Describes the build process, configuration and script file",
                         "properties": {
                             "guide": {
                                 "type": "string"
@@ -679,7 +893,8 @@
                         }
                     },
                     "test": {
-                        "type": "object",
+                        "$ref": "#/components/schemas/activity",
+                        "description": "Describes the test process, tools and script",
                         "properties": {
                             "guide": {
                                 "type": "string"
@@ -690,6 +905,7 @@
                         }
                     },
                     "health": {
+                        "description": "Information on the health service(s0 supported\nby the resource being described in this document.",
                         "type": "object",
                         "properties": {
                             "guide": {
@@ -717,6 +933,7 @@
                     },
                     "install": {
                         "$ref": "#/components/schemas/devops-action",
+                        "description": "The Install section gives information on installing the resource onto a server\nfor the first time.  The detection on whether the resource is already\ninstalled is not defined in the specifications.\n\nThe information can be in the form of an Ansibe playbook or commands to \nbe executed on the server.  You can also execute \ncommaonds from a script file that is found on the Git repo.",
                         "properties": {
                             "guide": {
                                 "type": "string"
@@ -751,6 +968,7 @@
                     },
                     "refresh": {
                         "$ref": "#/components/schemas/devops-action",
+                        "description": "The Refresh section gives information on refreshing the resource on the server.  \nThe instructions can be the same as for installing the first time.\n\nThe information can be in the form of a Ansibe playbook or commands to \nbe executed on the server with the component installed.  You can also execute \ncommaonds from a script file that is found on the Git repo.",
                         "properties": {
                             "guide": {
                                 "type": "string"
@@ -785,6 +1003,7 @@
                     },
                     "uninstall": {
                         "$ref": "#/components/schemas/devops-action",
+                        "description": "The Uninstall section gives information on uninstalling the component.\n\nThe information can be in the form of an Ansibe playbook or commands to \nbe executed on the server with the component installed.  You can also execute \ncommaonds from a script file that is found on the Git repo.",
                         "properties": {
                             "guide": {
                                 "type": "string"
@@ -818,7 +1037,7 @@
                         }
                     },
                     "apis": {
-                        "description": "List of OpenAPI definitions.\n\nThe list can include Git and REST versions, because before build the API might not be available\nas a REST service.",
+                        "description": "List of OpenAPI definitions.\n\nThe list can include Git and REST versions, because before build the API might not be available\nas a REST service.\n\nA resource may have multiple definitions files or even different versions.",
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/api"
@@ -846,6 +1065,7 @@
                     "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
                     "repository": {
                         "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
+                        "source-engine": "Git",
                         "source": "https://github.com",
                         "artefact": ""
                     },
@@ -967,13 +1187,78 @@
             },
             "api": {
                 "title": "Root Type for api",
-                "description": "",
-                "type": "string",
+                "description": "An API definition in OpenAPI format.\n\nThe definition file can be source from various locations, with\nthe most commo being either Git or REST (HTTPS) accessible \nlocations.\n\nA Git file can be accessed with Git command while REST / HTTPS\nmight use the \"wget\" or \"curl\" commands",
+                "required": [
+                    "engine",
+                    "url"
+                ],
+                "type": "object",
+                "properties": {
+                    "engine": {
+                        "description": "The engine that the Url refers to.  As the Url format is used by various \nprocessors, an engine value is required for proper processing.\n\nThe acceptable values will depend on the organisation, but the\nminimal values that need to be supported are:\n\n* GIT for Git located resources.  For this case the Git resource is assumed \n  to be in the Git repository for this DevOps resource if the prefix is not\n  HTTPS\n* REST for HTTP/S based web pages that are no explicitly handled by other engines\n\nOther ppssible values might be:\n\n* FILE for loca or LAN based resources \n* S/FTP for FTP based URL resources",
+                        "maxLength": 20,
+                        "type": "string"
+                    },
+                    "url": {
+                        "description": "A full URL for the API or if the valu is partial\nthen the location is assumed to be on the Git repo.  That is the host name and\nGit name are the same as for the \"devops.json\" file.\n\nIf the resource details are being supplied by a catalogu service\nthen the value in the \"repository\" section will be ued.",
+                        "maxLength": 500,
+                        "type": "string"
+                    }
+                },
                 "example": {
                     "engine": "REST",
                     "url": "api/v1/openapispec.json"
                 }
+            },
+            "activity": {
+                "title": "Root Type for activity",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "guide": {
+                        "type": "string"
+                    },
+                    "engine": {
+                        "type": "string"
+                    },
+                    "config": {
+                        "type": "string"
+                    },
+                    "script": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "guide": "https://",
+                    "engine": "JENKINS",
+                    "config": "/build/jenkins-build.conf",
+                    "script": "/build/builder.sh"
+                }
+            }
+        },
+        "securitySchemes": {
+            "BearerAuthentication": {
+                "scheme": "bearer",
+                "type": "http"
             }
         }
-    }
+    },
+    "tags": [
+        {
+            "name": "Published",
+            "description": "API has been deployed and is available for consumption"
+        },
+        {
+            "name": "Development",
+            "description": "API has been specified, but it is still in development and may change"
+        },
+        {
+            "name": "Drafted",
+            "description": "API has been drafted but is subject to change"
+        },
+        {
+            "name": "Proposed",
+            "description": "API has been proposed but no specification has been drafted"
+        }
+    ]
 }

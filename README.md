@@ -1,6 +1,6 @@
 # rediOps
 
-Rediscover DeveOps is about standardising how to find information about the code, specifically for use in the DevOps pipeline and 
+Rediscover DevOps is about standardising how to find information about the code, specifically for use in the DevOps pipeline and 
 for engineers to locate relavant information about the code and its capability and DevOps process.
 
 The information resides with the code in the code repository, commonly Git, and is human readable and also understood by tools.
@@ -26,8 +26,11 @@ for other files or actions to perform.
 ## Specification 
 
 The specification for the **devops.json** is defined as an OpenAPI document allowing the publishing 
-of hte information also as a REST service if so required - though this is not mandatory - and 
+of the information also as a REST service if so required - though this is not mandatory - and 
 the "devops.json" file is expected to exist before the code is deployed.
+
+The use of OpenAPI to define the details specification provides a format and protocol that can be understood
+by tools and engineers.  There a few aspects of the specifications that cannot be documented in OpenAPI.
 
 If you do publish the information as a REST service then you should consider protecting access to
 the data, especially if it contains data that may expose internal structures.
