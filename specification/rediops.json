@@ -3,7 +3,7 @@
     "info": {
         "title": "Rediscover DevOps configuration",
         "version": "v1",
-        "description": "This document describes the specification of the \nproposed file **.well-known/devops.json** that can \nbe used in the DevOps CI/cD as identifier for\ninformation required by the tools.\n\nBy using the .well-known location, assumptions are\nreduced if not eliminated by the automation tools.\n\nAutomation tools can also validate the information during \nsource commit to confirm the engineers are providing the necessary \ninformation and that it is valid.",
+        "description": "This document describes the specification of the \nproposed file **.well-known/devops.json** that can \nbe used in the DevOps CI/CD as identifier for\ninformation required by the tools.\n\nBy using the .well-known location, assumptions are\nreduced if not eliminated by the automation tools.\n\nThe end result is a design using HATEOS principles where further\ninformation on a resource can be obatined by following the bread crumbs of the \nrelationships in the **.well-known/devops.json** file.\n\nAutomation tools can also validate the information during \nsource commit to confirm the engineers are providing the necessary \ninformation and that it is valid.\n\nThe **devops.json** file has been defined using OpenAPI but that does not imply that\na real API needs to be deployed or used.  On the contrary it is unlikely that the main\ncopy stored on Git is accessed via a API service.  \n\nYou could build a catalogue service of all your **devops.json** definitions linked to\nGit definitions, but that is not a specification requirement.\n\nFor further information see https://github.com/meerkat-manor/rediOps",
         "contact": {
             "name": "Meerkat",
             "url": "https://github.com/meerkat-manor/rediOps",
@@ -15,14 +15,196 @@
         }
     },
     "paths": {
-        "/.well-known/devops": {
+        "/devops/": {
+            "summary": "List devops definitions",
+            "description": "This service will list the **devops** definitions registered \nwith it.\n\nThis definition is only applicable if the **deveops** is\npublished as a service outside of the source code.",
+            "get": {
+                "tags": [
+                    "Proposed"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/devopsbrief-model"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Listing matching resources"
+                    },
+                    "404": {
+                        "description": "No match for resource or no resources exist"
+                    }
+                },
+                "summary": "List matching captured resources",
+                "description": "Capability to list matching resorces captured from\ncode repositories"
+            },
+            "parameters": [
+                {
+                    "name": "id",
+                    "description": "List resources with matching asset id",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "in": "query"
+                },
+                {
+                    "name": "name",
+                    "description": "List resources matching on name",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "in": "query"
+                }
+            ]
+        },
+        "/devops/{id}": {
+            "summary": "Operate on the identified resources",
+            "description": "This service and its operations are intended for use where \nthe DevOps information from source control versioning (e.g. Git)\nis wanted to be stored on a centrral registry.\n\nThe process of updating the central registry can be automated by use\nof web hooks which will retrieve the latest **.well-known/deveops.json**\nfrom Git on commits as an example.\n\nThis definition is only applicable if the **deveops** is\npublished as a service outside of the source code.",
+            "get": {
+                "tags": [
+                    "Proposed"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/devops-model"
+                                }
+                            }
+                        },
+                        "description": "The DevOps record was found"
+                    },
+                    "404": {
+                        "description": "The required Devops recor with the requested identity wasnot found."
+                    }
+                },
+                "summary": "Fetch the Devops resource",
+                "description": "For web servers that provide a DevOps catalogue,this service\nfetches the details for the requested DevOps identity"
+            },
+            "post": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/devops-model"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/devops-model"
+                                }
+                            }
+                        },
+                        "description": "The updated record is returned to the caller\non succssful update"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuthentication": [
+                        ]
+                    }
+                ],
+                "summary": "Update the DevOps resource",
+                "description": "This service is for servers providing a catalogue service\nfor DevOps information.  The original Git details are not required to\nbe updated.\n\nYou could create a capability where this POST is used to \nupdate the source details and commit those changes."
+            },
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "Resource successfully deleted."
+                    },
+                    "401": {
+                        "description": "Not authorised to delete resource"
+                    },
+                    "404": {
+                        "description": "Resource not fouund"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuthentication": [
+                        ]
+                    }
+                ]
+            },
+            "parameters": [
+                {
+                    "examples": {
+                        "Sample": {
+                            "value": "\"AI7842389-01\""
+                        }
+                    },
+                    "name": "id",
+                    "description": "Resource identifier",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "in": "path",
+                    "required": true
+                }
+            ]
+        },
+        "/health": {
+            "summary": "Fetch the health of the service",
+            "description": "The service will return either a 200 (OK) or a 503 error message\n\nThis definition is only applicable if the **deveops** is\npublished as a service outside of the source code.",
             "get": {
                 "responses": {
                     "200": {
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/devops",
+                                    "$ref": "#/components/schemas/health-response"
+                                },
+                                "examples": {
+                                    "OK_state": {
+                                        "value": "\"OK\""
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Returns the healthy message"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/health-response"
+                                },
+                                "examples": {
+                                    "ERROR_sample": {
+                                        "value": "\"ERROR\""
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Service is not available"
+                    }
+                }
+            }
+        },
+        "/.well-known/devops.json": {
+            "description": "This fetches the **devops.json\" file for this service,\n\nThis definition is only applicable if the **deveops** is\npublished as a service outside of the source code.",
+            "get": {
+                "tags": [
+                    "Proposed"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/devops-model",
                                     "properties": {
                                         "version": {
                                             "type": "string",
@@ -75,14 +257,14 @@
                                         },
                                         "guide": {
                                             "type": "string",
-                                            "example": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview"
+                                            "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/overview.md"
                                         },
                                         "repository": {
                                             "type": "object",
                                             "properties": {
                                                 "guide": {
                                                     "type": "string",
-                                                    "example": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview"
+                                                    "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/repository.md"
                                                 },
                                                 "source": {
                                                     "type": "string",
@@ -134,7 +316,7 @@
                                             "properties": {
                                                 "guide": {
                                                     "type": "string",
-                                                    "example": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview"
+                                                    "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/build.md"
                                                 },
                                                 "engine": {
                                                     "type": "string",
@@ -147,7 +329,7 @@
                                             "properties": {
                                                 "guide": {
                                                     "type": "string",
-                                                    "example": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview"
+                                                    "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/test.md"
                                                 },
                                                 "engine": {
                                                     "type": "string",
@@ -167,7 +349,7 @@
                                             "properties": {
                                                 "guide": {
                                                     "type": "string",
-                                                    "example": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview"
+                                                    "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/health.md"
                                                 },
                                                 "api": {
                                                     "type": "array",
@@ -196,7 +378,7 @@
                                             "properties": {
                                                 "guide": {
                                                     "type": "string",
-                                                    "example": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview"
+                                                    "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/install.md"
                                                 },
                                                 "engine": {
                                                     "type": "string",
@@ -236,7 +418,7 @@
                                             "properties": {
                                                 "guide": {
                                                     "type": "string",
-                                                    "example": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview"
+                                                    "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/refresh.md"
                                                 },
                                                 "engine": {
                                                     "type": "string",
@@ -275,7 +457,7 @@
                                             "properties": {
                                                 "guide": {
                                                     "type": "string",
-                                                    "example": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview"
+                                                    "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/uninstall.md"
                                                 },
                                                 "engine": {
                                                     "type": "string",
@@ -331,9 +513,9 @@
                                                 "twitter": "",
                                                 "matrix": "@devops:meerkat-manor.org"
                                             },
-                                            "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
+                                            "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/overview.md",
                                             "repository": {
-                                                "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
+                                                "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/repository.md",
                                                 "source-engine": "Git",
                                                 "source": "https://github.com",
                                                 "artefact": ""
@@ -356,11 +538,11 @@
                                                 ]
                                             },
                                             "build": {
-                                                "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
+                                                "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/build.md",
                                                 "engine": "JENKINS"
                                             },
                                             "test": {
-                                                "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
+                                                "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/test.md",
                                                 "engine": "UNITTEST"
                                             },
                                             "api": [
@@ -374,7 +556,7 @@
                                                 }
                                             ],
                                             "health": {
-                                                "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
+                                                "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/health.md",
                                                 "api": [
                                                     {
                                                         "url": "/health",
@@ -384,7 +566,7 @@
                                                 ]
                                             },
                                             "install": {
-                                                "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
+                                                "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/install.md",
                                                 "engine": "ANSIBLE",
                                                 "playbook": "",
                                                 "commands": {
@@ -399,7 +581,7 @@
                                                 }
                                             },
                                             "refresh": {
-                                                "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
+                                                "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/refresh.md",
                                                 "engine": "COMMAND",
                                                 "playbook": "",
                                                 "commands": {
@@ -412,7 +594,7 @@
                                                 }
                                             },
                                             "uninstall": {
-                                                "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
+                                                "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/uninstall.md",
                                                 "engine": "ANSIBLE",
                                                 "playbook": "",
                                                 "commands": {
@@ -433,210 +615,262 @@
                         "description": ""
                     }
                 },
-                "security": [
-                    {
-
-                    }
-                ],
                 "summary": "Fetch the DevOps information",
                 "description": "Commonly the DevOps information is not fetched using a REST API but is actually the JSON file stored the root **.well-known** directory as the file name **devops.json**\n\nIf so required there can be a supporting REST API to fetch the contents, but that is not the primary intent."
             }
-        },
-        "/devops": {
-            "get": {
-                "responses": {
-                    "404": {
-                        "description": "No match for resource or no resources exist"
-                    },
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/devops"
-                                    }
-                                }
-                            }
-                        },
-                        "description": "Listing matching resources"
-                    }
-                },
-                "security": [
-                    {
-
-                    }
-                ]
-            },
-            "parameters": [
-                {
-                    "name": "id",
-                    "description": "List resources with matching asset id",
-                    "schema": {
-                        "type": "string"
-                    },
-                    "in": "query"
-                },
-                {
-                    "name": "name",
-                    "description": "List resources matchin on name",
-                    "schema": {
-                        "type": "string"
-                    },
-                    "in": "query"
-                }
-            ]
-        },
-        "/devops/{id}": {
-            "summary": "Operate on the identified resources",
-            "get": {
-                "parameters": [
-                    {
-                        "name": "id",
-                        "description": "Identifier for the DevOps resource.\n\nThe identifier is the Asset Id which is asumed to be unique for the catalogue servce.",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/devops"
-                                }
-                            }
-                        },
-                        "description": "The DevOps record was found"
-                    },
-                    "404": {
-                        "description": "The required Devops recor with the requested identity wasnot found."
-                    }
-                },
-                "security": [
-                    {
-
-                    }
-                ],
-                "summary": "Fetch the Devops resource",
-                "description": "For web servers that provide a DevOps catalogue,this service\nfetches the details for the requested DevOps identity"
-            },
-            "post": {
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/devops"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "parameters": [
-                    {
-                        "name": "id",
-                        "description": "Identifer of the DevOps resource.\n\nThis must match the asset identifier and is unique across all DevOps.",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/devops"
-                                }
-                            }
-                        },
-                        "description": "The updated record is returned to the caller\non succssful update"
-                    }
-                },
-                "security": [
-                    {
-                        "BearerAuthentication": [
-                        ]
-                    }
-                ],
-                "summary": "Update the DevOps resource",
-                "description": "This service is for servers providing a catalogue service\nfor DevOps information.  The original Git details are not required to\nbe updated.\n\nYou could create a capability where this POST is used to \nupdate the source details and commit those changes."
-            },
-            "delete": {
-                "parameters": [
-                    {
-                        "name": "id",
-                        "description": "Resource identifier for resource to be deleted",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Resource successfully deleted."
-                    },
-                    "404": {
-                        "description": "Resource not fouund"
-                    },
-                    "401": {
-                        "description": "Not authorised to delete resource"
-                    }
-                },
-                "security": [
-                    {
-                        "BearerAuthentication": [
-                        ]
-                    }
-                ]
-            },
-            "parameters": [
-                {
-                    "examples": {
-                        "Sample": {
-                            "value": "\"AI7842389-01\""
-                        }
-                    },
-                    "name": "id",
-                    "description": "Resource identifier",
-                    "schema": {
-                        "type": "string"
-                    },
-                    "in": "path",
-                    "required": true
-                }
-            ]
         }
     },
     "components": {
         "schemas": {
-            "devops-action": {
-                "title": "Root Type for devops-action",
+            "owner-contact": {
+                "title": "Root Type for asset-owner",
+                "description": "The name and /or contact detals of the DevOps owner.\n\nThe owner can be a single person or a team.  It is preferale thati t is more\ngranualr then the organisation.\n\nIf you have a CMDB catalgue then the entry here should match the details on\nthe CMDB if you choose to include them here.\n\nThe contact details do not include a phone / mobile / cell number on purpose\nas this information is either know by the reader for the person / team or\ncan be obtained from an organisations internal directory.\n\nAutomated tools are unlikely to benefit from having access to a phone number, but they\ncan send emails or post messages to Slack.",
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "description": "The email adress of the owner.\n\nThe email address could be a distribution list.",
+                        "minLength": 6,
+                        "pattern": "([-!#-'*+/-9=?A-Z^-~]+(\\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \\t]|(\\\\[\\t -~]))+\")@([0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)*|\\[((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|IPv6:((((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){6}|::((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){5}|[0-9A-Fa-f]{0,4}::((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){4}|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):)?(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){3}|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){0,2}(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){2}|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){0,3}(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){0,4}(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::)((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3})|(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3})|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){0,5}(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3})|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){0,6}(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::)|(?!IPv6:)[0-9A-Za-z-]*[0-9A-Za-z]:[!-Z^-~]+)])",
+                        "type": "string",
+                        "example": "emilia.jackson@devops.example.com"
+                    },
+                    "web": {
+                        "description": "A web page URL for the owner.\n\nThe web page could refer to a team page.",
+                        "type": "string"
+                    },
+                    "slack": {
+                        "description": "Slack address of the owner.",
+                        "type": "string"
+                    },
+                    "twitter": {
+                        "description": "Twitter handle for the contact",
+                        "type": "string"
+                    },
+                    "matrix": {
+                        "description": "The matrrix IM identfier of the owner",
+                        "type": "string",
+                        "example": "@devops:meerkat-manor.org"
+                    },
+                    "name": {
+                        "description": "The name of the owner.\n\nThis may be persons or teams name.",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "email": "devops@meerkatmanor-tech.org",
+                    "web": "meerkatmanor-tech.org",
+                    "slack": "",
+                    "twitter": "",
+                    "matrix": "@devops:meerkat-manor.org"
+                }
+            },
+            "activity-model": {
+                "title": "Root Type for activity",
                 "description": "",
+                "required": [
+                    "engine"
+                ],
                 "type": "object",
                 "properties": {
                     "guide": {
-                        "type": "string"
+                        "description": "Link to documentation",
+                        "type": "string",
+                        "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/activity.md"
                     },
                     "engine": {
-                        "enum": [
-                            "ANSIBLE",
-                            "COMMANDS"
-                        ],
+                        "$ref": "#/components/schemas/engine-model",
+                        "description": "Engine used for activties.\n\nFor example the engine name can be:\n\n* azure-pipeline\n* circle-ci\n* jenkins",
+                        "maxLength": 20,
+                        "example": "{\n    \"category\": \"BUILD\",\n    \"name\": \"Jenkins\",\n    \"url\": \"some text\"\n}"
+                    },
+                    "config": {
+                        "description": "A configuration file that can be an URL location or a Git folder",
                         "type": "string"
+                    },
+                    "script": {
+                        "description": "A script file that is executed to perform the activity.\n\nThe choice of processing engine is up to the organisation, or \nsome assumptions can be made based on file extension.\n\nFor example:\n\n* .sh = Bash\n* .ps1 = PowerShell\n* .bat = MS DOS command",
+                        "type": "string",
+                        "example": "/build/builder.sh"
+                    }
+                },
+                "example": {
+                    "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/build.md",
+                    "engine": {
+                        "category": "BUILD",
+                        "name": "Jenkins",
+                        "url": "some text"
+                    },
+                    "config": "/build/jenkins-build.conf",
+                    "script": "/build/builder.sh"
+                }
+            },
+            "dependency-model": {
+                "title": "Root Type for dependency-action",
+                "description": "The dependency section provides information on:\n\n1. APIs that the service calls such as ODBC, Authentication, System of Record API\n2. Tools that are required for build, testing and deployment",
+                "type": "object",
+                "properties": {
+                    "guide": {
+                        "description": "Link to documentation on dependencies",
+                        "type": "string",
+                        "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/dependency.md"
+                    },
+                    "apis": {
+                        "description": "List of downstream dependency APIs.\n\nThe list can include:\n\n1. RESTful APIs\n2. SOAP APIs\n3. File transfer APIs\n4. ODBC or JDBC connections\n\nNo credentials are required to be captured in the definiton. Please do not include user names or passwords.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/api-model"
+                        },
+                        "example": "[\n    {\n        \"asset_id\": \"AI560003\",\n        \"protocol\": \"ODBC\",\n        \"url\": \"\"\n    },\n    {\n        \"asset_id\": \"AI560044\",\n        \"protocol\": \"REST\",\n        \"url\": \"\"\n    }\n]"
+                    },
+                    "tools": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/tools-model"
+                        }
+                    }
+                },
+                "example": "{\n    \"guide\": \"https://github.com/meerkat-manor/rediOps/blob/main/guide/dependency.md\",\n    \"apis\": [\n        {\n            \"engine\": {\n                \"category\": \"TEST\",\n                \"name\": \"some text\",\n                \"url\": \"some text\"\n            },\n            \"url\": \"some text\"\n        },\n        {\n            \"engine\": {\n                \"category\": \"SOURCE\",\n                \"name\": \"some text\",\n                \"url\": \"some text\"\n            },\n            \"url\": \"some text\"\n        }\n    ],\n    \"tools\": [\n        {\n            \"guide\": \"some text\",\n            \"engine\": {\n                \"category\": \"API\",\n                \"name\": \"some text\",\n                \"url\": \"some text\"\n            },\n            \"playbook\": \"some text\",\n            \"commands\": [\n                \"some text\",\n                \"some text\"\n            ]\n        },\n        {\n            \"guide\": \"some text\",\n            \"engine\": {\n                \"category\": \"OTHER\",\n                \"name\": \"some text\",\n                \"url\": \"some text\"\n            },\n            \"playbook\": \"some text\",\n            \"commands\": [\n                \"some text\",\n                \"some text\"\n            ]\n        }\n    ]\n}\n\n{\n    \"apis\": [\n        {\n            \"asset_id\": \"AI560003\",\n            \"protocol\": \"ODBC\",\n            \"url\": \"\"\n        },\n        {\n            \"asset_id\": \"AI560044\",\n            \"protocol\": \"REST\",\n            \"url\": \"\"\n        }\n    ],\n    \"tools\": [\n        {\n            \"asset_id\": \"AI560003\",\n            \"protocol\": \"ODBC\",\n            \"url\": \"\"\n        },\n        {\n            \"asset_id\": \"AI560044\",\n            \"protocol\": \"REST\",\n            \"url\": \"\"\n        }\n    ]\n}"
+            },
+            "repository-model": {
+                "title": "Root Type for repository",
+                "description": "Link information to repositories for various registeries.\n\nYou can add custom extensions with prefix **x-** ",
+                "type": "object",
+                "properties": {
+                    "guide": {
+                        "description": "Link to documentation on repositories used by this component",
+                        "type": "string",
+                        "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/repository.md"
+                    },
+                    "artefact": {
+                        "$ref": "#/components/schemas/engine-model",
+                        "description": "Artefact engine\n\nSome common engines are:\n\n* Artifactory\n* Archiva\n\nCI servers can also have their own repository for generated artifact \n"
+                    },
+                    "source": {
+                        "$ref": "#/components/schemas/engine-model",
+                        "description": "Source control version engine.\n\nThis can be used by tools to retreive source code using binary executables.\n\nSome common tools are \"Git\", \"TFS\", \"Mercurial\", \"CVS\".",
+                        "example": "Git"
+                    }
+                },
+                "example": {
+                    "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/repository.md",
+                    "artefact": {
+                        "category": "ARTIFACT",
+                        "name": "Artefactory",
+                        "url": "https://archive.excample.com/"
+                    },
+                    "source": {
+                        "category": "SOURCE",
+                        "name": "Git",
+                        "url": "https://github.com"
+                    }
+                }
+            },
+            "tools-model": {
+                "title": "Root Type for tools-action",
+                "description": "The purpose of the tools section is an aid to identify the various tols required \nduring build, testing and deployment.  This can server as a documentation item \nor actually preparing the nevironment to contain the necessary tool.\n\nIf you are using a well defined tool that is linked to your source versioning by\nweb hook then you are not likely to require this section for execution. \n\nA sample use case for a simple environment is to identify a tool that needs\nto be fetched from an artifact storage location as it is required by the \ndeployment install script.",
+                "type": "object",
+                "properties": {
+                    "guide": {
+                        "description": "Link to documentation for the tool in the context of this DevOps",
+                        "type": "string",
+                        "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/tool.md"
+                    },
+                    "engine": {
+                        "$ref": "#/components/schemas/engine-model",
+                        "description": "The processor to execute the commands.\n\nFor example you can define it as \"powershell\" to execute script file with extension .ps1\n\nYou cannot combine different commands for different processors in the one tools set.  If you have different\nprocessors you can define multiple tools. ",
+                        "example": ""
                     },
                     "playbook": {
                         "type": "string"
                     },
                     "commands": {
-                        "$ref": "#/components/schemas/commands",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "properties": {
+                            "pre": {
+                                "type": "array",
+                                "items": {
+
+                                }
+                            },
+                            "script": {
+                                "type": "string"
+                            },
+                            "post": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/tool.md",
+                    "engine": {
+                        "category": "REFRESH",
+                        "name": "cmd",
+                        "url": "some text"
+                    },
+                    "playbook": "some text",
+                    "commands": [
+                        "some text",
+                        "some text"
+                    ]
+                }
+            },
+            "asset-model": {
+                "title": "Root Type for asset-id",
+                "description": "A reference record linking the resource to an organisation asset record\nsuch as a CMDB entry.",
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "description": "An external identifier for this rsource.",
+                        "maxLength": 50,
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "A name of the resource in the asset (CMDB) registry.\n\nThis could differ from the name specified in the \nparent level.",
+                        "type": "string"
+                    },
+                    "url": {
+                        "description": "An URL to the resource in the asset (CMDB) registry.",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "id": "AID07828923",
+                    "name": "devops",
+                    "url": ""
+                }
+            },
+            "deploy-model": {
+                "title": "Root Type for devops-action",
+                "description": "Provides information of the commands or scripts to use when\nthe resources is bing installed, refreshed or uninstalled.\n\nThe script or playbook can be sourced from the source version manager (e.g. Git)",
+                "required": [
+                    "engine"
+                ],
+                "type": "object",
+                "properties": {
+                    "guide": {
+                        "description": "Link to documentation for the topic",
+                        "type": "string",
+                        "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/deploy.md"
+                    },
+                    "engine": {
+                        "$ref": "#/components/schemas/engine-model",
+                        "description": "The processor to understand and execute the commands or playbook.",
+                        "example": ""
+                    },
+                    "playbook": {
+                        "description": "Playbook parameters",
+                        "type": "string"
+                    },
+                    "commands": {
+                        "$ref": "#/components/schemas/commands-model",
+                        "description": "Commands or script to be processed",
                         "properties": {
                             "pre": {
                                 "type": "array",
@@ -657,22 +891,80 @@
                     }
                 },
                 "example": {
-                    "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
-                    "engine": "ANSIBLE",
+                    "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/command.md",
+                    "engine": {
+                        "category": "COMMAND",
+                        "name": "bash"
+                    },
                     "playbook": "",
                     "commands": {
                         "pre": [
                             "hostname",
                             "whoami"
                         ],
-                        "script": "deploy/install.sh",
+                        "script": "/deploy/install.sh",
                         "post": [
                             "echo Bye Bye"
                         ]
                     }
                 }
             },
-            "commands": {
+            "health-model": {
+                "title": "Root Type for health-model",
+                "description": "Lists the health services the resource exposes.\n\nThe guide can provide more detais about the health checks and their depth of checking.",
+                "type": "object",
+                "properties": {
+                    "guide": {
+                        "description": "Link to documentation describing the health check",
+                        "type": "string",
+                        "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/health.md"
+                    },
+                    "api": {
+                        "description": "List of health check APIs published by the\nresource",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/healthapi-model"
+                        }
+                    }
+                },
+                "example": {
+                    "guide": "https://",
+                    "api": [
+                        {
+                            "url": "/health",
+                            "status": 200,
+                            "response": ""
+                        }
+                    ]
+                }
+            },
+            "healthapi-model": {
+                "title": "Root Type for healthapi-modle",
+                "description": "Describes the health service that the resource exposes.\n\nThe definition can inlcude expected response details",
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "description": "URL for health check path.  The path if suppied must\nmatch a path in the service definition (OpenAPI)\n\nUsing the URL path the details of the health check can\nbe found in the service definition.\n\nNormally a human coud make an intelligent assumption on\nwhat the name of the health check but a machine will find it\nmore difficult.  Also consider how you would identify it \nin a foreign language.",
+                        "type": "string"
+                    },
+                    "status": {
+                        "format": "int32",
+                        "description": "The HTTP status code for a successful health check.\n\n",
+                        "type": "integer",
+                        "example": "200"
+                    },
+                    "response": {
+                        "description": "The expected response body from a healthy service",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "url": "/health",
+                    "status": 200,
+                    "response": ""
+                }
+            },
+            "commands-model": {
                 "title": "Root Type for commands",
                 "description": "Commands are executed by the engine.  The commands need to be constructed in a format compatible with the engine. ",
                 "type": "object",
@@ -707,67 +999,98 @@
                     ]
                 }
             },
-            "owner-contact": {
-                "title": "Root Type for asset-owner",
-                "description": "The name and /or contact detals of the DevOps owner.\n\nThe owner can be a single person or a team.  It is preferale thati t is more\ngranualr then the organisation.\n\nIf you have a CMDB catalgue then the entry here should match the details on\nthe CMDB if you choose to include them here.\n\nThe contact details do not include a phone / mobile / cell number on purpose\nas this information is either know by the reader for the person / team or\ncan be obtained from an organisations internal directory.\n\nAutomated tools are unlikely to benefit from having access to a phone number, but they\ncan send emails or post messages to Slack.",
+            "engine-model": {
+                "title": "Root Type for engine-model",
+                "description": "Engine details as used for apis, build, testing, configuration and deployment",
+                "required": [
+                    "category"
+                ],
                 "type": "object",
                 "properties": {
-                    "email": {
-                        "description": "The email adress of the owner.\n\nThe email address could be a distribution list.",
-                        "minLength": 6,
-                        "pattern": "([-!#-'*+/-9=?A-Z^-~]+(\\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \\t]|(\\\\[\\t -~]))+\")@([0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)*|\\[((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|IPv6:((((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){6}|::((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){5}|[0-9A-Fa-f]{0,4}::((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){4}|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):)?(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){3}|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){0,2}(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){2}|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){0,3}(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){0,4}(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::)((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3})|(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3})|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){0,5}(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3})|(((0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}):){0,6}(0|[1-9A-Fa-f][0-9A-Fa-f]{0,3}))?::)|(?!IPv6:)[0-9A-Za-z-]*[0-9A-Za-z]:[!-Z^-~]+)])",
-                        "type": "string"
-                    },
-                    "web": {
-                        "description": "A web page URL for the owner.\n\nThe web page could refer to a team page.",
-                        "type": "string"
-                    },
-                    "slack": {
-                        "description": "Slack address of the owner.",
-                        "type": "string"
-                    },
-                    "twitter": {
-                        "type": "string"
-                    },
-                    "matrix": {
-                        "description": "The matrrix IM identfier of the owner",
+                    "category": {
+                        "description": "Category of the engine",
+                        "enum": [
+                            "BUILD",
+                            "TEST",
+                            "DEPLOY",
+                            "UNINSTALL",
+                            "SOURCE",
+                            "API",
+                            "CONFIG",
+                            "ARTEFACT",
+                            "COMMAND",
+                            "OTHER"
+                        ],
                         "type": "string"
                     },
                     "name": {
-                        "description": "The name of the owner.\n\nThis may be persons or teams name.",
-                        "type": "string"
-                    }
-                },
-                "example": {
-                    "email": "devops@meerkatmanor-tech.org",
-                    "web": "meerkatmanor-tech.org",
-                    "slack": "",
-                    "twitter": "",
-                    "matrix": "@devops:meerkat-manor.org"
-                }
-            },
-            "asset-id": {
-                "title": "Root Type for asset-id",
-                "description": "",
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    },
-                    "name": {
+                        "description": "A common name for the tool, such as:\n\n* makefile\n* teamcity\n* azure-pipeline\n\nThe choice is up to you but you should keep it consistent.",
                         "type": "string"
                     },
                     "url": {
+                        "description": "Link to engine or its configuration\n\nThe format of the URL will depend on the engine",
                         "type": "string"
                     }
                 },
                 "example": {
-                    "id": "AID07828923",
-                    "name": "devops",
-                    "url": ""
+                    "category": "CONFIG",
+                    "name": "some text",
+                    "url": "/asset.conf"
                 }
             },
-            "devops": {
+            "api-model": {
+                "title": "Root Type for api",
+                "description": "A link to the API definition in OpenAPI format.\n\nThe definition file can be source from various locations, with\nthe most commo being either Git or REST (HTTPS) accessible \nlocations.\n\nA Git file can be accessed with Git command while REST / HTTPS\nmight use the \"wget\" or \"curl\" commands",
+                "required": [
+                    "engine",
+                    "url"
+                ],
+                "type": "object",
+                "properties": {
+                    "guide": {
+                        "description": "Link to documentation for the topic",
+                        "type": "string",
+                        "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/api.md"
+                    },
+                    "engine": {
+                        "$ref": "#/components/schemas/engine-model",
+                        "description": "The engine that the Url refers to.  As the Url format is used by various \nprocessors, an engine value is required for proper processing.\n\nThe acceptable values will depend on the organisation, but the\nminimal values that need to be supported are:\n\n* GIT for Git located resources.  For this case the Git resource is assumed \n  to be in the Git repository for this DevOps resource if the prefix is not\n  HTTPS\n* REST for HTTP/S based web pages that are no explicitly handled by other engines\n\nOther possible values might be:\n\n* FILE for local or LAN based resources \n* S/FTP for FTP based URL resources",
+                        "maxLength": 20,
+                        "minLength": 0
+                    },
+                    "url": {
+                        "description": "A full URL for the API or if the value is partial\nthen the location is assumed to be on the Git repo.  That is the host name and\nGit name are the same as for the \"devops.json\" file.\n\nIf the resource details are being supplied by a catalogu service\nthen the value in the \"repository\" section will be used.",
+                        "maxLength": 500,
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "engine": "REST",
+                    "url": "api/v1/openapispec.json"
+                }
+            },
+            "health-response": {
+                "title": "Root Type for health-response",
+                "description": "A response to the **/health** service\nand not a data model for **rediops** model\nas used in the **devops.json** definition",
+                "required": [
+                    "message",
+                    "status"
+                ],
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "status": "OK",
+                    "message": "Available"
+                }
+            },
+            "devops-model": {
                 "title": "Root Type for devops",
                 "description": "Information that supports DevOps activity.",
                 "required": [
@@ -776,6 +1099,11 @@
                 ],
                 "type": "object",
                 "properties": {
+                    "unique_id": {
+                        "description": "Unique identifier \n\nThis is only applicable when the definition is serviced from a catalogue\nthat requires unique identifers.\n\nDo not use the Git repository URL as the unique identifier because\nto retrieve the file you would have to know the location. ",
+                        "type": "string",
+                        "example": "b85ffc5c-a1be-4bce-935e-4633577c7c1b"
+                    },
                     "version": {
                         "description": "Specification version\n\nMajor versions may not be compatible with minor versions.",
                         "type": "string",
@@ -805,7 +1133,7 @@
                         "example": "Ecommeerce web site"
                     },
                     "asset": {
-                        "$ref": "#/components/schemas/asset-id",
+                        "$ref": "#/components/schemas/asset-model",
                         "description": "Rsource information that is intended to be related to a Computer Management Database (CMDB).\n\nBy linking to the asset in an CMDB, further information can be retrieved.\n\nIf the CMDB link exists then it should be considered the authorative source where the same information exists in this definition.\n\nIf you wish the DevOps workflow to control the information and be versioned with Git, then you can use this information to push updates to the CMDB.  Just include processing of the __./well-known/devops.json__ into your deployment pipeline and post to the CMDB the updates.",
                         "example": "{\r\n    \"id\": \"AID07828923\",\r\n    \"name\": \"devops\",\r\n    \"url\": \"\"\r\n}"
                     },
@@ -831,12 +1159,13 @@
                         }
                     },
                     "guide": {
-                        "description": "A link to documentation for the resource being \ndescribed by this document.\n\nThe preferece is that the links is in the format of a HTTPS URL to a \nhuman readable web page.",
-                        "type": "string"
+                        "description": "A link to documentation for the resource being \ndescribed by this document.\n\nThe preference is that the links is in the format of a HTTPS URL to a \nhuman readable web page.",
+                        "type": "string",
+                        "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/overview.md"
                     },
                     "repository": {
+                        "$ref": "#/components/schemas/repository-model",
                         "description": "Repository links",
-                        "type": "object",
                         "properties": {
                             "guide": {
                                 "type": "string"
@@ -850,7 +1179,8 @@
                         }
                     },
                     "dependency": {
-                        "type": "object",
+                        "$ref": "#/components/schemas/dependency-model",
+                        "description": "Describes the dependecies for the resource.\n\nThe dependecies include databases, downstream APIS, and build tooks.",
                         "properties": {
                             "guide": {
                                 "type": "string"
@@ -881,8 +1211,11 @@
                         }
                     },
                     "build": {
-                        "$ref": "#/components/schemas/activity",
                         "description": "Describes the build process, configuration and script file",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/activity-model"
+                        },
                         "properties": {
                             "guide": {
                                 "type": "string"
@@ -893,8 +1226,11 @@
                         }
                     },
                     "test": {
-                        "$ref": "#/components/schemas/activity",
                         "description": "Describes the test process, tools and script",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/activity-model"
+                        },
                         "properties": {
                             "guide": {
                                 "type": "string"
@@ -902,11 +1238,12 @@
                             "engine": {
                                 "type": "string"
                             }
-                        }
+                        },
+                        "example": "[\r\n    {\r\n        \"guide\": \"https://github.com/meerkat-manor/rediOps/blob/main/guide/test.md\",\r\n        \"engine\": \"UNITTEST\"\r\n    }\r\n]"
                     },
                     "health": {
+                        "$ref": "#/components/schemas/health-model",
                         "description": "Information on the health service(s0 supported\nby the resource being described in this document.",
-                        "type": "object",
                         "properties": {
                             "guide": {
                                 "type": "string"
@@ -932,7 +1269,7 @@
                         }
                     },
                     "install": {
-                        "$ref": "#/components/schemas/devops-action",
+                        "$ref": "#/components/schemas/deploy-model",
                         "description": "The Install section gives information on installing the resource onto a server\nfor the first time.  The detection on whether the resource is already\ninstalled is not defined in the specifications.\n\nThe information can be in the form of an Ansibe playbook or commands to \nbe executed on the server.  You can also execute \ncommaonds from a script file that is found on the Git repo.",
                         "properties": {
                             "guide": {
@@ -967,7 +1304,7 @@
                         }
                     },
                     "refresh": {
-                        "$ref": "#/components/schemas/devops-action",
+                        "$ref": "#/components/schemas/deploy-model",
                         "description": "The Refresh section gives information on refreshing the resource on the server.  \nThe instructions can be the same as for installing the first time.\n\nThe information can be in the form of a Ansibe playbook or commands to \nbe executed on the server with the component installed.  You can also execute \ncommaonds from a script file that is found on the Git repo.",
                         "properties": {
                             "guide": {
@@ -1002,7 +1339,7 @@
                         }
                     },
                     "uninstall": {
-                        "$ref": "#/components/schemas/devops-action",
+                        "$ref": "#/components/schemas/deploy-model",
                         "description": "The Uninstall section gives information on uninstalling the component.\n\nThe information can be in the form of an Ansibe playbook or commands to \nbe executed on the server with the component installed.  You can also execute \ncommaonds from a script file that is found on the Git repo.",
                         "properties": {
                             "guide": {
@@ -1040,199 +1377,48 @@
                         "description": "List of OpenAPI definitions.\n\nThe list can include Git and REST versions, because before build the API might not be available\nas a REST service.\n\nA resource may have multiple definitions files or even different versions.",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/api"
-                        }
-                    }
-                },
-                "example": {
-                    "version": "0.0.1",
-                    "created_on": "2022-03-04T15:43:21Z",
-                    "updated_on": "2022-03-04T15:43:21Z",
-                    "organisation": "Meerkat Manor Tech College",
-                    "name": "Web site",
-                    "asset": {
-                        "id": "AID07828923",
-                        "name": "website",
-                        "url": ""
-                    },
-                    "owner": {
-                        "email": "devops@meerkatmanor-tech.org",
-                        "web": "meerkatmanor-tech.org",
-                        "slack": "",
-                        "twitter": "",
-                        "matrix": "@devops:meerkat-manor.org"
-                    },
-                    "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
-                    "repository": {
-                        "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
-                        "source-engine": "Git",
-                        "source": "https://github.com",
-                        "artefact": ""
-                    },
-                    "dependency": {
-                        "guide": "",
-                        "apis": [
-                            {
-                                "asset_id": "AI560003",
-                                "protocol": "ODBC",
-                                "url": ""
-                            },
-                            {
-                                "asset_id": "AI560044",
-                                "protocol": "REST",
-                                "url": ""
-                            }
-                        ],
-                        "tools": [
-                        ]
-                    },
-                    "build": {
-                        "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
-                        "engine": "JENKINS"
-                    },
-                    "test": {
-                        "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
-                        "engine": "UNITTEST"
-                    },
-                    "api": [
-                        "api/v1/openapispec.json",
-                        "api/v2/openapispec.json"
-                    ],
-                    "health": {
-                        "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
-                        "api": [
-                            {
-                                "url": "/health",
-                                "status": 200,
-                                "response": ""
-                            }
-                        ]
-                    },
-                    "install": {
-                        "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
-                        "engine": "ANSIBLE",
-                        "playbook": "",
-                        "commands": {
-                            "pre": [
-                                "hostname",
-                                "whoami"
-                            ],
-                            "script": "deploy/install.sh",
-                            "post": [
-                                "echo Bye Bye"
-                            ]
-                        }
-                    },
-                    "refresh": {
-                        "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
-                        "engine": "COMMAND",
-                        "playbook": "",
-                        "commands": {
-                            "pre": [
-                            ],
-                            "script": "deploy/refresh.sh",
-                            "post": [
-                                "echo Refresh completed"
-                            ]
-                        }
-                    },
-                    "uninstall": {
-                        "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
-                        "engine": "ANSIBLE",
-                        "playbook": "",
-                        "commands": {
-                            "pre": [
-                            ],
-                            "script": "deploy/decomission.sh",
-                            "post": [
-                                "rm -R /opt/meerkat-manor/example",
-                                "echo Component removed"
-                            ]
+                            "$ref": "#/components/schemas/api-model"
                         }
                     }
                 }
             },
-            "repository": {
-                "title": "Root Type for repository",
-                "description": "Link information to repositories for various registeries.\n\nYou can add custom extensions with prefix **x-** ",
-                "type": "object",
-                "properties": {
-                    "guide": {
-                        "description": "Link tgo documentation on repositories used by this component",
-                        "type": "string"
-                    },
-                    "source-engine": {
-                        "description": "Source control version engine.\n\nThis can be used by tools to retreive source code using binary executables.\n\nSome common tools are \"Git\", \"TFS\", \"Mercurial\", \"CVS\".",
-                        "type": "string",
-                        "example": "Git"
-                    },
-                    "source": {
-                        "description": "Link to source version control system, such as Git.\n\nThe version control engine will provide the source version control system.",
-                        "type": "string"
-                    },
-                    "artefact-engine": {
-                        "type": "string"
-                    },
-                    "artefact": {
-                        "type": "string"
-                    }
-                },
-                "example": {
-                    "guide": "https://sku61.atlassian.net/wiki/spaces/WELLKNOWN/overview",
-                    "source-engine": "Git",
-                    "source": "https://github.com",
-                    "artefact-engine": "Archiva",
-                    "artefact": ""
-                }
-            },
-            "api": {
-                "title": "Root Type for api",
-                "description": "An API definition in OpenAPI format.\n\nThe definition file can be source from various locations, with\nthe most commo being either Git or REST (HTTPS) accessible \nlocations.\n\nA Git file can be accessed with Git command while REST / HTTPS\nmight use the \"wget\" or \"curl\" commands",
+            "devopsbrief-model": {
+                "description": "Used only for services and not part of the \n**rediops** definition ",
                 "required": [
-                    "engine",
-                    "url"
+                    "unique_id",
+                    "version",
+                    "name",
+                    "guide",
+                    "self"
                 ],
                 "type": "object",
                 "properties": {
-                    "engine": {
-                        "description": "The engine that the Url refers to.  As the Url format is used by various \nprocessors, an engine value is required for proper processing.\n\nThe acceptable values will depend on the organisation, but the\nminimal values that need to be supported are:\n\n* GIT for Git located resources.  For this case the Git resource is assumed \n  to be in the Git repository for this DevOps resource if the prefix is not\n  HTTPS\n* REST for HTTP/S based web pages that are no explicitly handled by other engines\n\nOther ppssible values might be:\n\n* FILE for loca or LAN based resources \n* S/FTP for FTP based URL resources",
-                        "maxLength": 20,
+                    "unique_id": {
+                        "description": "Unique identifier of he devops definitions",
                         "type": "string"
                     },
-                    "url": {
-                        "description": "A full URL for the API or if the valu is partial\nthen the location is assumed to be on the Git repo.  That is the host name and\nGit name are the same as for the \"devops.json\" file.\n\nIf the resource details are being supplied by a catalogu service\nthen the value in the \"repository\" section will be ued.",
-                        "maxLength": 500,
+                    "version": {
+                        "description": "Version of the devops definition",
                         "type": "string"
-                    }
-                },
-                "example": {
-                    "engine": "REST",
-                    "url": "api/v1/openapispec.json"
-                }
-            },
-            "activity": {
-                "title": "Root Type for activity",
-                "description": "",
-                "type": "object",
-                "properties": {
+                    },
+                    "name": {
+                        "description": "Name of the devops definition",
+                        "type": "string"
+                    },
                     "guide": {
+                        "description": "Link to the guide of the devops definition",
                         "type": "string"
                     },
-                    "engine": {
-                        "type": "string"
-                    },
-                    "config": {
-                        "type": "string"
-                    },
-                    "script": {
+                    "self": {
+                        "description": "Link to full details of rediops definition as \ndefined by **deveops.json**\"",
                         "type": "string"
                     }
                 },
                 "example": {
-                    "guide": "https://",
-                    "engine": "JENKINS",
-                    "config": "/build/jenkins-build.conf",
-                    "script": "/build/builder.sh"
+                    "unique_id": "some text",
+                    "version": "some text",
+                    "name": "some text",
+                    "guide": "some text"
                 }
             }
         },

@@ -1,6 +1,6 @@
 # Dependency
 
-The dependency section is for defining any downstream APIs.  An API can be:
+The **dependency** section of the **devops.json** is for defining any downstream APIs.  An API can be:
 
 * ODBC or JDBC connection
 * REST
@@ -12,6 +12,9 @@ For each dependency you can define the:
    This enables you to locate the details if you have a central database.
 2. Protocol: The protocol that connects to the downstream component
 3. URL: The resource location.  This has different meanings for each protocol
+
+Like all sections, there is guide reference which can give further information
+on how the section can be used.
 
 ## OBC or JDBC
 

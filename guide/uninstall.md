@@ -1,11 +1,14 @@
 # Uninstall
 
-The uninstall section is to enable the discovery of the functions
+The **uninstall** section of the **devops.json** is to enable the discovery of the functions
 to use when a decommisison of the component is required.
 
 The definition does not include details about the server or infrastructure
 as these can vary.  This is definition works similar to the Ansible 
 inventory and playbooks.
+
+Like all sections, there is guide reference which can give further information
+on how the section can be used.
 
 ## Engine
 

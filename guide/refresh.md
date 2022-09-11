@@ -1,7 +1,10 @@
 # Refresh 
 
-The refresh section is to enable the discovery of the functions
+The **refresh** section of the **devops.json** is to enable the discovery of the functions
 to use when a refresh of the component is required.
+
+Like all sections, there is guide reference which can give further information
+on how the section can be used.
 
 ## Engine
 

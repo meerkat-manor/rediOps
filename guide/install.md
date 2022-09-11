@@ -1,6 +1,6 @@
 # Install
 
-The install section is to enable the discovery of the functions
+The **install** section of the **devops.json** is to enable the discovery of the functions
 to use when a install of the component is required.
 
 The definition does not include details about the server or infrastructure
@@ -10,6 +10,9 @@ inventory and playbooks.
 The same instructions for installation can be used for both non-production
 and production installation if the environment attributes are
 soft coded.
+
+Like all sections, there is guide reference which can give further information
+on how the section can be used.
 
 ## Engine
 
