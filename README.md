@@ -15,7 +15,29 @@ and to use the information for activities such as:
 
 * build
 * deploy
-* discover APIs definitions
+* discover OpenAPI definitions
+
+## What does it do
+
+The **.well-known/devops.json** specification removes devops process 
+assumptions, such as script locations. It also provides a location
+to store application reference links such a OpenAPI definitions.
+All this with the code on Git / source version control.
+
+You may already have a devops toolchain for build and deploy but many require
+you to enter the Git details into them.  By having a **devops** definition as
+described here you can further automate the process - and have a roadmap
+to change tooling if circumstances change.
+
+If you do not include the **.well-known/devops.json** file creation into 
+your Git repository creation process, maybe some of the concepts may 
+provoke some improvements into your current process.
+
+## What doesn't it do
+
+The **devops** definition does not replace your existing tools or processes.
+
+
 
 ## Background
 
@@ -23,8 +45,14 @@ A common approach organisations have is to create well known, at least within th
 file names within Git repositories and then configure tools to access those files for their configuration 
 and execution.
 
-The proposal here is to define one DevOps file location and the content within to provide location information
-for other files or actions to perform.
+These well known organisation files tend to reside in the root directory
+or some well known directory such as "tools" or "build".  As you include 
+more tools and processes the number of these files grow in the root
+directory.
+
+The proposal here is to define one DevOps file location and the content 
+within to provide location information for other files or actions to 
+perform.
 
 ## Specification 
 
@@ -58,3 +86,15 @@ If your organisation already has standard automation tools and pipeline process,
 and the specifications that useful.  If the specification is not relevant in its entirety, maybe you find the
 concept or portions useful for adaptation in your organisation.
 
+## SBOM
+
+With increased attention on software supply chains and the need to 
+create and update the software bill of materials (SBOM), the 
+proposed definition is flexible to linking to SBOM tools if required.
+
+Your existing tooling may already cater for SBOM creation so please
+check.  If your existing tools do cover SBOM then you could link
+the results to the **devops.json** definition so that it is 
+closer to the source.
+
+See the link for more information on [SBOM](guide/sbom.md)

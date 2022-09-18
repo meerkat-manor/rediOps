@@ -64,7 +64,7 @@
         },
         "/devops/{id}": {
             "summary": "Operate on the identified resources",
-            "description": "This service and its operations are intended for use where \nthe DevOps information from source control versioning (e.g. Git)\nis wanted to be stored on a centrral registry.\n\nThe process of updating the central registry can be automated by use\nof web hooks which will retrieve the latest **.well-known/deveops.json**\nfrom Git on commits as an example.\n\nThis definition is only applicable if the **deveops** is\npublished as a service outside of the source code.",
+            "description": "This service and its operations are intended for use where \nthe DevOps information from source versioning (e.g. Git)\nis wanted to be stored on a centrral registry.\n\nThe process of updating the central registry can be automated by use\nof web hooks which will retrieve the latest **.well-known/deveops.json**\nfrom Git on commits as an example.\n\nThis definition is only applicable if the **deveops** is\npublished as a service outside of the source code.",
             "get": {
                 "tags": [
                     "Proposed"
@@ -747,7 +747,7 @@
                     },
                     "source": {
                         "$ref": "#/components/schemas/engine-model",
-                        "description": "Source control version engine.\n\nThis can be used by tools to retreive source code using binary executables.\n\nSome common tools are \"Git\", \"TFS\", \"Mercurial\", \"CVS\".",
+                        "description": "Source version control system engine.\n\nThis can be used by tools to retreive source code using binary executables.\n\nSome common tools are \"Git\", \"TFS\", \"Mercurial\", \"CVS\".",
                         "example": "Git"
                     }
                 },
