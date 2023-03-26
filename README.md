@@ -29,9 +29,12 @@ you to enter the Git details into them.  By having a **devops** definition as
 described here you can further automate the process - and have a roadmap
 to change tooling if circumstances change.
 
-If you do not include the **.well-known/devops.json** file creation into 
-your Git repository creation process, maybe some of the concepts may 
-provoke some improvements into your current process.
+Some automation to the process can be achieved by executing simple
+scripts at the start of the project. 
+
+If you decide that **.well-known/devops.json** is not for you
+maybe some of the concepts may provoke some improvements into 
+your current process.
 
 ## What doesn't it do
 

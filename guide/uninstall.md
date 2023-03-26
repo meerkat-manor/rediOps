@@ -1,5 +1,8 @@
 # Uninstall
 
+_Note_: This document is not about the uninstall of
+**rediops**. 
+
 The **uninstall** section of the **devops.json** is to enable the discovery of the functions
 to use when a decommisison of the component is required.
 

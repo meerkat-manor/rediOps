@@ -1,5 +1,8 @@
 # Install
 
+_Note_: This document is not about the installation of
+**rediops**. 
+
 The **install** section of the **devops.json** is to enable the discovery of the functions
 to use when a install of the component is required.
 
