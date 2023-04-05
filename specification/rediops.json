@@ -2,8 +2,8 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Rediscover DevOps configuration",
-        "version": "v1",
-        "description": "This document describes the specification of the \nproposed file **.well-known/devops.json** that can \nbe used in the DevOps CI/CD as identifier for\ninformation required by the tools.\n\nBy using the .well-known location, assumptions are\nreduced if not eliminated by the automation tools.\n\nThe end result is a design using HATEOS principles where further\ninformation on a resource can be obatined by following the bread crumbs of the \nrelationships in the **.well-known/devops.json** file.\n\nAutomation tools can also validate the information during \nsource commit to confirm the engineers are providing the necessary \ninformation and that it is valid.\n\nThe **devops.json** file has been defined using OpenAPI but that does not imply that\na real API needs to be deployed or used.  On the contrary it is unlikely that the main\ncopy stored on Git is accessed via a API service.  \n\nYou could build a catalogue service of all your **devops.json** definitions linked to\nGit definitions, but that is not a specification requirement.\n\nFor further information see https://github.com/meerkat-manor/rediOps",
+        "version": "0.0.2",
+        "description": "This document describes the specification of the \nproposed file **.well-known/devops.json** that can \nbe used in the DevOps CI/CD as identifier for\ninformation required by the tools.\n\nBy using the .well-known location, assumptions are\nreduced if not eliminated by the automation tools.\n\nThe end result is a design using HATEOS principles where further\ninformation on a resource can be obatined by following the bread crumbs of the \nrelationships in the **.well-known/devops.json** file.\n\nAutomation tools can also validate the information during \nsource commit to confirm the engineers are providing the necessary \ninformation and that it is valid.\n\nThe **devops.json** file has been defined using OpenAPI but that does not imply that\na real API needs to be deployed or used.  On the contrary it is unlikely that the main\ncopy stored on Git is accessed via a API service.  The **devops.json** file can also\ninclude a AsyncOpen definition, so the one definition **devops.json** definition\ncan support a single compute resource that handles both synchronous and asynchronous\nservice models for a subject domain.\n\nYou could build a catalogue service of all your **devops.json** definitions linked to\nGit definitions, but that is not a specification requirement.\n\nFor further information see https://github.com/meerkat-manor/rediOps",
         "contact": {
             "name": "Meerkat",
             "url": "https://github.com/meerkat-manor/rediOps",
@@ -64,7 +64,7 @@
         },
         "/devops/{id}": {
             "summary": "Operate on the identified resources",
-            "description": "This service and its operations are intended for use where \nthe DevOps information from source versioning (e.g. Git)\nis wanted to be stored on a centrral registry.\n\nThe process of updating the central registry can be automated by use\nof web hooks which will retrieve the latest **.well-known/deveops.json**\nfrom Git on commits as an example.\n\nThis definition is only applicable if the **deveops** is\npublished as a service outside of the source code.",
+            "description": "This service and its operations are intended for use where \nthe DevOps information from source control versioning (e.g. Git)\nis wanted to be stored on a centrral registry.\n\nThe process of updating the central registry can be automated by use\nof web hooks which will retrieve the latest **.well-known/deveops.json**\nfrom Git on commits as an example.\n\nThis definition is only applicable if the **deveops** is\npublished as a service outside of the source code.",
             "get": {
                 "tags": [
                     "Proposed"
@@ -112,8 +112,7 @@
                 },
                 "security": [
                     {
-                        "BearerAuthentication": [
-                        ]
+                        "BearerAuthentication": []
                     }
                 ],
                 "summary": "Update the DevOps resource",
@@ -133,8 +132,7 @@
                 },
                 "security": [
                     {
-                        "BearerAuthentication": [
-                        ]
+                        "BearerAuthentication": []
                     }
                 ]
             },
@@ -194,7 +192,7 @@
             }
         },
         "/.well-known/devops.json": {
-            "description": "This fetches the **devops.json\" file for this service,\n\nThis definition is only applicable if the **deveops** is\npublished as a service outside of the source code.",
+            "description": "This fetches the **devops.json** file for this service,\n\nThis definition is only applicable if the **deveops** is\npublished as a service outside of the source code.",
             "get": {
                 "tags": [
                     "Proposed"
@@ -305,9 +303,7 @@
                                                 },
                                                 "tools": {
                                                     "type": "array",
-                                                    "items": {
-
-                                                    }
+                                                    "items": {}
                                                 }
                                             }
                                         },
@@ -433,9 +429,7 @@
                                                     "properties": {
                                                         "pre": {
                                                             "type": "array",
-                                                            "items": {
-
-                                                            }
+                                                            "items": {}
                                                         },
                                                         "script": {
                                                             "type": "string",
@@ -472,9 +466,7 @@
                                                     "properties": {
                                                         "pre": {
                                                             "type": "array",
-                                                            "items": {
-
-                                                            }
+                                                            "items": {}
                                                         },
                                                         "script": {
                                                             "type": "string",
@@ -534,8 +526,7 @@
                                                         "url": ""
                                                     }
                                                 ],
-                                                "tools": [
-                                                ]
+                                                "tools": []
                                             },
                                             "build": {
                                                 "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/build.md",
@@ -585,8 +576,7 @@
                                                 "engine": "COMMAND",
                                                 "playbook": "",
                                                 "commands": {
-                                                    "pre": [
-                                                    ],
+                                                    "pre": [],
                                                     "script": "deploy/refresh.sh",
                                                     "post": [
                                                         "echo Refresh completed"
@@ -598,8 +588,7 @@
                                                 "engine": "ANSIBLE",
                                                 "playbook": "",
                                                 "commands": {
-                                                    "pre": [
-                                                    ],
+                                                    "pre": [],
                                                     "script": "deploy/decomission.sh",
                                                     "post": [
                                                         "rm -R /opt/meerkat-manor/example",
@@ -624,7 +613,7 @@
         "schemas": {
             "owner-contact": {
                 "title": "Root Type for asset-owner",
-                "description": "The name and /or contact detals of the DevOps owner.\n\nThe owner can be a single person or a team.  It is preferale thati t is more\ngranualr then the organisation.\n\nIf you have a CMDB catalgue then the entry here should match the details on\nthe CMDB if you choose to include them here.\n\nThe contact details do not include a phone / mobile / cell number on purpose\nas this information is either know by the reader for the person / team or\ncan be obtained from an organisations internal directory.\n\nAutomated tools are unlikely to benefit from having access to a phone number, but they\ncan send emails or post messages to Slack.",
+                "description": "The name and /or contact detals of the DevOps owner.\n\nThe owner can be a single person or a team.  It is preferale that it is more\ngranular then the organisation.\n\nIf you have a CMDB catalgue then the entry here should match the details on\nthe CMDB if you choose to include them here.\n\nThe contact details do not include a phone / mobile / cell number on purpose\nas this information is either know by the reader for the person / team or\ncan be obtained from an organisations internal directory.\n\nAutomated tools are unlikely to benefit from having access to a phone number, but they\ncan send emails or post messages to Slack.",
                 "type": "object",
                 "properties": {
                     "email": {
@@ -668,7 +657,7 @@
                 "title": "Root Type for activity",
                 "description": "",
                 "required": [
-                    "engine"
+                    "activity"
                 ],
                 "type": "object",
                 "properties": {
@@ -676,12 +665,6 @@
                         "description": "Link to documentation",
                         "type": "string",
                         "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/activity.md"
-                    },
-                    "engine": {
-                        "$ref": "#/components/schemas/engine-model",
-                        "description": "Engine used for activties.\n\nFor example the engine name can be:\n\n* azure-pipeline\n* circle-ci\n* jenkins",
-                        "maxLength": 20,
-                        "example": "{\n    \"category\": \"BUILD\",\n    \"name\": \"Jenkins\",\n    \"url\": \"some text\"\n}"
                     },
                     "config": {
                         "description": "A configuration file that can be an URL location or a Git folder",
@@ -691,22 +674,28 @@
                         "description": "A script file that is executed to perform the activity.\n\nThe choice of processing engine is up to the organisation, or \nsome assumptions can be made based on file extension.\n\nFor example:\n\n* .sh = Bash\n* .ps1 = PowerShell\n* .bat = MS DOS command",
                         "type": "string",
                         "example": "/build/builder.sh"
+                    },
+                    "activity": {
+                        "$ref": "#/components/schemas/engine-model",
+                        "description": "Engine used for activties.\n\nFor example the engine name can be:\n\n* azure-pipeline\n* circle-ci\n* jenkins\n\n_Note_: The engine category can be **BUILD**, **DEPLOY**,\n**INSTALL**",
+                        "maxLength": 20,
+                        "example": "{\n    \"category\": \"BUILD\",\n    \"name\": \"Jenkins\",\n    \"url\": \"some text\"\n}"
                     }
                 },
                 "example": {
-                    "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/build.md",
-                    "engine": {
-                        "category": "BUILD",
-                        "name": "Jenkins",
+                    "guide": "some text",
+                    "config": "some text",
+                    "script": "some text",
+                    "activity": {
+                        "category": "ARTIFACT",
+                        "name": "some text",
                         "url": "some text"
-                    },
-                    "config": "/build/jenkins-build.conf",
-                    "script": "/build/builder.sh"
+                    }
                 }
             },
             "dependency-model": {
                 "title": "Root Type for dependency-action",
-                "description": "The dependency section provides information on:\n\n1. APIs that the service calls such as ODBC, Authentication, System of Record API\n2. Tools that are required for build, testing and deployment",
+                "description": "The dependency section provides information on:\n\n1. Calls to a system of record either as a database call or another service (e.g. REST) call\n2. Other OpenAPIs that the service calls as a synchronous request and response\n3. Other AsyncAPIs that the service as a publish fire and forget async call\n4. Other APIs that the service calls such as ODBC, authentication, logging\n5. Tools that are required for build, testing and deployment\n \nThe information provided here can help documenting the deoendencies for the \nCMDB, cross reference the code, enable gateway configuration \nand produce sequence diagram\n",
                 "type": "object",
                 "properties": {
                     "guide": {
@@ -715,7 +704,7 @@
                         "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/dependency.md"
                     },
                     "apis": {
-                        "description": "List of downstream dependency APIs.\n\nThe list can include:\n\n1. RESTful APIs\n2. SOAP APIs\n3. File transfer APIs\n4. ODBC or JDBC connections\n\nNo credentials are required to be captured in the definiton. Please do not include user names or passwords.",
+                        "description": "List of downstream dependency APIs.\n\nThe list can include:\n\n1. RESTful APIs\n2. SOAP APIs\n3. Event or AMQP APIs\n3. File transfer APIs\n4. ODBC or JDBC connections\n\nNo credentials are required to be captured in the definiton. Please do not include user names or passwords.",
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/api-model"
@@ -729,7 +718,59 @@
                         }
                     }
                 },
-                "example": "{\n    \"guide\": \"https://github.com/meerkat-manor/rediOps/blob/main/guide/dependency.md\",\n    \"apis\": [\n        {\n            \"engine\": {\n                \"category\": \"TEST\",\n                \"name\": \"some text\",\n                \"url\": \"some text\"\n            },\n            \"url\": \"some text\"\n        },\n        {\n            \"engine\": {\n                \"category\": \"SOURCE\",\n                \"name\": \"some text\",\n                \"url\": \"some text\"\n            },\n            \"url\": \"some text\"\n        }\n    ],\n    \"tools\": [\n        {\n            \"guide\": \"some text\",\n            \"engine\": {\n                \"category\": \"API\",\n                \"name\": \"some text\",\n                \"url\": \"some text\"\n            },\n            \"playbook\": \"some text\",\n            \"commands\": [\n                \"some text\",\n                \"some text\"\n            ]\n        },\n        {\n            \"guide\": \"some text\",\n            \"engine\": {\n                \"category\": \"OTHER\",\n                \"name\": \"some text\",\n                \"url\": \"some text\"\n            },\n            \"playbook\": \"some text\",\n            \"commands\": [\n                \"some text\",\n                \"some text\"\n            ]\n        }\n    ]\n}\n\n{\n    \"apis\": [\n        {\n            \"asset_id\": \"AI560003\",\n            \"protocol\": \"ODBC\",\n            \"url\": \"\"\n        },\n        {\n            \"asset_id\": \"AI560044\",\n            \"protocol\": \"REST\",\n            \"url\": \"\"\n        }\n    ],\n    \"tools\": [\n        {\n            \"asset_id\": \"AI560003\",\n            \"protocol\": \"ODBC\",\n            \"url\": \"\"\n        },\n        {\n            \"asset_id\": \"AI560044\",\n            \"protocol\": \"REST\",\n            \"url\": \"\"\n        }\n    ]\n}"
+                "example": {
+                    "guide": "some text",
+                    "apis": [
+                        {
+                            "guide": "some text",
+                            "url": "some text",
+                            "format": "OpenAPI",
+                            "api": {
+                                "category": "API",
+                                "name": "some text",
+                                "url": "some text"
+                            }
+                        },
+                        {
+                            "guide": "some text",
+                            "url": "some text",
+                            "format": "AsyncAPI",
+                            "api": {
+                                "category": "API",
+                                "name": "some text",
+                                "url": "some text"
+                            }
+                        }
+                    ],
+                    "tools": [
+                        {
+                            "guide": "some text",
+                            "playbook": "some text",
+                            "commands": [
+                                "some text",
+                                "some text"
+                            ],
+                            "tool": {
+                                "category": "CONFIG",
+                                "name": "some text",
+                                "url": "some text"
+                            }
+                        },
+                        {
+                            "guide": "some text",
+                            "playbook": "some text",
+                            "commands": [
+                                "some text",
+                                "some text"
+                            ],
+                            "tool": {
+                                "category": "COMMAND",
+                                "name": "some text",
+                                "url": "some text"
+                            }
+                        }
+                    ]
+                }
             },
             "repository-model": {
                 "title": "Root Type for repository",
@@ -741,27 +782,27 @@
                         "type": "string",
                         "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/repository.md"
                     },
-                    "artefact": {
-                        "$ref": "#/components/schemas/engine-model",
-                        "description": "Artefact engine\n\nSome common engines are:\n\n* Artifactory\n* Archiva\n\nCI servers can also have their own repository for generated artifact \n"
-                    },
                     "source": {
                         "$ref": "#/components/schemas/engine-model",
-                        "description": "Source version control system engine.\n\nThis can be used by tools to retreive source code using binary executables.\n\nSome common tools are \"Git\", \"TFS\", \"Mercurial\", \"CVS\".",
+                        "description": "Source control version engine.\n\nThis can be used by tools to retreive source code using binary executables.\n\nSome common tools are \"Git\", \"TFS\", \"Mercurial\", \"CVS\".\n\n_Note_: The engine category is **SOURCE** or **CUSTOM**",
                         "example": "Git"
+                    },
+                    "artifact": {
+                        "$ref": "#/components/schemas/engine-model",
+                        "description": "Artifact engine\n\nSome common engines are:\n\n* Artifactory\n* Archiva\n\nCI servers can also have their own repository for generated artifact \n\n_Note_: The engine category is **ARTIFACT** or **CUSTOM**\n"
                     }
                 },
                 "example": {
-                    "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/repository.md",
-                    "artefact": {
-                        "category": "ARTIFACT",
-                        "name": "Artefactory",
-                        "url": "https://archive.excample.com/"
-                    },
+                    "guide": "some text",
                     "source": {
                         "category": "SOURCE",
-                        "name": "Git",
-                        "url": "https://github.com"
+                        "name": "some text",
+                        "url": "some text"
+                    },
+                    "artifact": {
+                        "category": "ARTIFACT",
+                        "name": "some text",
+                        "url": "some text"
                     }
                 }
             },
@@ -775,15 +816,11 @@
                         "type": "string",
                         "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/tool.md"
                     },
-                    "engine": {
-                        "$ref": "#/components/schemas/engine-model",
-                        "description": "The processor to execute the commands.\n\nFor example you can define it as \"powershell\" to execute script file with extension .ps1\n\nYou cannot combine different commands for different processors in the one tools set.  If you have different\nprocessors you can define multiple tools. ",
-                        "example": ""
-                    },
                     "playbook": {
                         "type": "string"
                     },
                     "commands": {
+                        "description": "Array of commands to execute in the environment",
                         "type": "array",
                         "items": {
                             "type": "string"
@@ -791,9 +828,7 @@
                         "properties": {
                             "pre": {
                                 "type": "array",
-                                "items": {
-
-                                }
+                                "items": {}
                             },
                             "script": {
                                 "type": "string"
@@ -805,20 +840,25 @@
                                 }
                             }
                         }
+                    },
+                    "tool": {
+                        "$ref": "#/components/schemas/engine-model",
+                        "description": "The processor to execute the commands.\n\nFor example you can define it as \"powershell\" to execute script file with extension .ps1\n\nYou cannot combine different commands for different processors in the one tools set.  If you have different\nprocessors you can define multiple tools. \n\n_Note_: The engine category is **TOOL**",
+                        "example": ""
                     }
                 },
                 "example": {
-                    "guide": "https://github.com/meerkat-manor/rediOps/blob/main/guide/tool.md",
-                    "engine": {
-                        "category": "REFRESH",
-                        "name": "cmd",
-                        "url": "some text"
-                    },
+                    "guide": "some text",
                     "playbook": "some text",
                     "commands": [
                         "some text",
                         "some text"
-                    ]
+                    ],
+                    "tool": {
+                        "category": "COMMAND",
+                        "name": "some text",
+                        "url": "some text"
+                    }
                 }
             },
             "asset-model": {
@@ -850,7 +890,7 @@
                 "title": "Root Type for devops-action",
                 "description": "Provides information of the commands or scripts to use when\nthe resources is bing installed, refreshed or uninstalled.\n\nThe script or playbook can be sourced from the source version manager (e.g. Git)",
                 "required": [
-                    "engine"
+                    "deploy"
                 ],
                 "type": "object",
                 "properties": {
@@ -858,11 +898,6 @@
                         "description": "Link to documentation for the topic",
                         "type": "string",
                         "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/deploy.md"
-                    },
-                    "engine": {
-                        "$ref": "#/components/schemas/engine-model",
-                        "description": "The processor to understand and execute the commands or playbook.",
-                        "example": ""
                     },
                     "playbook": {
                         "description": "Playbook parameters",
@@ -888,6 +923,11 @@
                                 }
                             }
                         }
+                    },
+                    "deploy": {
+                        "$ref": "#/components/schemas/engine-model",
+                        "description": "The processor to understand and execute the commands or playbook.\n\nThe engine category depends on the parent of \nthis model. \n\nFor __test__ it can be:\n\n* COMMAND\n* TEST or\n* CUSTOM",
+                        "example": ""
                     }
                 },
                 "example": {
@@ -907,61 +947,6 @@
                             "echo Bye Bye"
                         ]
                     }
-                }
-            },
-            "health-model": {
-                "title": "Root Type for health-model",
-                "description": "Lists the health services the resource exposes.\n\nThe guide can provide more detais about the health checks and their depth of checking.",
-                "type": "object",
-                "properties": {
-                    "guide": {
-                        "description": "Link to documentation describing the health check",
-                        "type": "string",
-                        "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/health.md"
-                    },
-                    "api": {
-                        "description": "List of health check APIs published by the\nresource",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/healthapi-model"
-                        }
-                    }
-                },
-                "example": {
-                    "guide": "https://",
-                    "api": [
-                        {
-                            "url": "/health",
-                            "status": 200,
-                            "response": ""
-                        }
-                    ]
-                }
-            },
-            "healthapi-model": {
-                "title": "Root Type for healthapi-modle",
-                "description": "Describes the health service that the resource exposes.\n\nThe definition can inlcude expected response details",
-                "type": "object",
-                "properties": {
-                    "url": {
-                        "description": "URL for health check path.  The path if suppied must\nmatch a path in the service definition (OpenAPI)\n\nUsing the URL path the details of the health check can\nbe found in the service definition.\n\nNormally a human coud make an intelligent assumption on\nwhat the name of the health check but a machine will find it\nmore difficult.  Also consider how you would identify it \nin a foreign language.",
-                        "type": "string"
-                    },
-                    "status": {
-                        "format": "int32",
-                        "description": "The HTTP status code for a successful health check.\n\n",
-                        "type": "integer",
-                        "example": "200"
-                    },
-                    "response": {
-                        "description": "The expected response body from a healthy service",
-                        "type": "string"
-                    }
-                },
-                "example": {
-                    "url": "/health",
-                    "status": 200,
-                    "response": ""
                 }
             },
             "commands-model": {
@@ -1001,7 +986,7 @@
             },
             "engine-model": {
                 "title": "Root Type for engine-model",
-                "description": "Engine details as used for apis, build, testing, configuration and deployment",
+                "description": "Engine details as used for apis, build, testing, configuration and deployment\n\nIf a tool is used and the URL is an input then it is expected that the \ntool will understand the content/format of the input.",
                 "required": [
                     "category"
                 ],
@@ -1017,9 +1002,9 @@
                             "SOURCE",
                             "API",
                             "CONFIG",
-                            "ARTEFACT",
+                            "ARTIFACT",
                             "COMMAND",
-                            "OTHER"
+                            "CUSTOM"
                         ],
                         "type": "string"
                     },
@@ -1040,10 +1025,11 @@
             },
             "api-model": {
                 "title": "Root Type for api",
-                "description": "A link to the API definition in OpenAPI format.\n\nThe definition file can be source from various locations, with\nthe most commo being either Git or REST (HTTPS) accessible \nlocations.\n\nA Git file can be accessed with Git command while REST / HTTPS\nmight use the \"wget\" or \"curl\" commands",
+                "description": "Commonly a link to the API definition in OpenAPI, AsyncAPI or WSDL format.\n\nThe definition file can be source from various locations, with\nthe most common being either Git or REST (HTTPS) accessible \nlocations.\n\nA Git file can be accessed with Git command while REST / HTTPS\nmight use the \"wget\" or \"curl\" commands",
                 "required": [
-                    "engine",
-                    "url"
+                    "api",
+                    "url",
+                    "format"
                 ],
                 "type": "object",
                 "properties": {
@@ -1052,25 +1038,108 @@
                         "type": "string",
                         "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/api.md"
                     },
-                    "engine": {
+                    "url": {
+                        "description": "A full URL for the API specification or if the value is partial\nthen the location is assumed to be on the Git repo.  That is the host name and\nGit name are the same as for the \"devops.json\" file.\n\nIf the resource details are being supplied by a catalogue service\nthen the value in the \"repository\" section will be used.\n\nThis is not the URL for the API implementation as that \nvalue is expected to be stored with the deployment information\nsuch as a CMDB.",
+                        "maxLength": 500,
+                        "type": "string",
+                        "example": "/config/openapi.json"
+                    },
+                    "format": {
+                        "description": "The format or type of specification.  The defined formats are:\n\n* OpenAPI\n* AsyncAPI\n* WSDL\n* Custom\n\nOther formats can be added in future versions, and allowance is made for \na custom, in-house format.\n\n_Note_: This is not the format of the actual document such as YAML or JSON or XML.",
+                        "enum": [
+                            "OpenAPI",
+                            "AsyncAPI",
+                            "WSDL",
+                            "Custom"
+                        ],
+                        "type": "string",
+                        "example": "OpenAPI"
+                    },
+                    "api": {
                         "$ref": "#/components/schemas/engine-model",
-                        "description": "The engine that the Url refers to.  As the Url format is used by various \nprocessors, an engine value is required for proper processing.\n\nThe acceptable values will depend on the organisation, but the\nminimal values that need to be supported are:\n\n* GIT for Git located resources.  For this case the Git resource is assumed \n  to be in the Git repository for this DevOps resource if the prefix is not\n  HTTPS\n* REST for HTTP/S based web pages that are no explicitly handled by other engines\n\nOther possible values might be:\n\n* FILE for local or LAN based resources \n* S/FTP for FTP based URL resources",
+                        "description": "The engine that the Url refers to.  As the Url format is used by various \nprocessors, an engine value is required for proper processing.\n\nThe acceptable values will depend on the organisation, but the\nminimal values that need to be supported are:\n\n* GIT for Git located resources.  For this case the Git resource is assumed \n  to be in the Git repository for this DevOps resource if the prefix is not\n  HTTPS\n* REST for HTTP/S based web pages that are no explicitly handled by other engines\n\nOther possible values might be:\n\n* FILE for local or LAN based resources \n* S/FTP for FTP based URL resources\n \n_Note_: The engine category is **API**",
                         "maxLength": 20,
                         "minLength": 0
+                    }
+                },
+                "example": {
+                    "guide": "some text",
+                    "url": "some text",
+                    "format": "Custom",
+                    "api": {
+                        "category": "ARTIFACT",
+                        "name": "some text",
+                        "url": "some text"
+                    }
+                }
+            },
+            "devopsbrief-model": {
+                "description": "Used only for services and not part of the \n**rediops** definition ",
+                "required": [
+                    "unique_id",
+                    "version",
+                    "name",
+                    "guide",
+                    "self"
+                ],
+                "type": "object",
+                "properties": {
+                    "unique_id": {
+                        "description": "Unique identifier of he devops definitions",
+                        "type": "string"
                     },
-                    "url": {
-                        "description": "A full URL for the API or if the value is partial\nthen the location is assumed to be on the Git repo.  That is the host name and\nGit name are the same as for the \"devops.json\" file.\n\nIf the resource details are being supplied by a catalogu service\nthen the value in the \"repository\" section will be used.",
-                        "maxLength": 500,
+                    "version": {
+                        "description": "Version of the devops definition",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "Name of the devops definition",
+                        "type": "string"
+                    },
+                    "guide": {
+                        "description": "Link to the guide of the devops definition",
+                        "type": "string"
+                    },
+                    "self": {
+                        "description": "Link to full details of rediops definition as \ndefined by **deveops.json**\"",
                         "type": "string"
                     }
                 },
                 "example": {
-                    "engine": "REST",
-                    "url": "api/v1/openapispec.json"
+                    "unique_id": "some text",
+                    "version": "some text",
+                    "name": "some text",
+                    "guide": "some text"
+                }
+            },
+            "healthapi-model": {
+                "title": "healthapi-modle",
+                "description": "Describes the health service that the resource exposes.\n\nThe definition can inlcude expected response details",
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "description": "URL for health check path.  The path if suppied must\nmatch a path in the service definition (OpenAPI)\n\nUsing the URL path the details of the health check can\nbe found in the service definition.\n\nNormally a human coud make an intelligent assumption on\nwhat the name of the health check but a machine will find it\nmore difficult.  Also consider how you would identify it \nin a foreign language.",
+                        "type": "string"
+                    },
+                    "status": {
+                        "format": "int32",
+                        "description": "The HTTP status code for a successful health check.\n\n",
+                        "type": "integer",
+                        "example": "200"
+                    },
+                    "response": {
+                        "description": "The expected response body from a healthy service",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "url": "/health",
+                    "status": 200,
+                    "response": ""
                 }
             },
             "health-response": {
-                "title": "Root Type for health-response",
+                "title": "health-response",
                 "description": "A response to the **/health** service\nand not a data model for **rediops** model\nas used in the **devops.json** definition",
                 "required": [
                     "message",
@@ -1090,24 +1159,54 @@
                     "message": "Available"
                 }
             },
+            "health-model": {
+                "title": "health-model",
+                "description": "Lists the health services the resource exposes.\n\nThe guide can provide more detais about the health checks and their depth of checking.",
+                "type": "object",
+                "properties": {
+                    "guide": {
+                        "description": "Link to documentation describing the health check",
+                        "type": "string",
+                        "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/health.md"
+                    },
+                    "api": {
+                        "description": "List of health check APIs published by the\nresource",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/healthapi-model"
+                        }
+                    }
+                },
+                "example": {
+                    "guide": "https://",
+                    "api": [
+                        {
+                            "url": "/health",
+                            "status": 200,
+                            "response": ""
+                        }
+                    ]
+                }
+            },
             "devops-model": {
                 "title": "Root Type for devops",
                 "description": "Information that supports DevOps activity.",
                 "required": [
                     "version",
-                    "name"
+                    "name",
+                    "tags"
                 ],
                 "type": "object",
                 "properties": {
+                    "devops_version": {
+                        "description": "**devops** specification version\n\nMajor versions may not be compatible with minor versions.\n\nThis is not the version of the application or source.\n\nThe value here is the OpenAPI version of this specification\nand is not your version of your specifications.  This is analogous\nto the \"openapi\" field in the OpenAPI document.",
+                        "type": "string",
+                        "example": "0.1.34"
+                    },
                     "unique_id": {
                         "description": "Unique identifier \n\nThis is only applicable when the definition is serviced from a catalogue\nthat requires unique identifers.\n\nDo not use the Git repository URL as the unique identifier because\nto retrieve the file you would have to know the location. ",
                         "type": "string",
                         "example": "b85ffc5c-a1be-4bce-935e-4633577c7c1b"
-                    },
-                    "version": {
-                        "description": "Specification version\n\nMajor versions may not be compatible with minor versions.",
-                        "type": "string",
-                        "example": "0.1.34"
                     },
                     "created_on": {
                         "format": "date-time",
@@ -1134,7 +1233,7 @@
                     },
                     "asset": {
                         "$ref": "#/components/schemas/asset-model",
-                        "description": "Rsource information that is intended to be related to a Computer Management Database (CMDB).\n\nBy linking to the asset in an CMDB, further information can be retrieved.\n\nIf the CMDB link exists then it should be considered the authorative source where the same information exists in this definition.\n\nIf you wish the DevOps workflow to control the information and be versioned with Git, then you can use this information to push updates to the CMDB.  Just include processing of the __./well-known/devops.json__ into your deployment pipeline and post to the CMDB the updates.",
+                        "description": "Resource information that is intended to be related to a Computer Management Database (CMDB).\n\nBy linking to the asset in an CMDB, further information can be retrieved.\n\nIf the CMDB link exists then it should be considered the authorative source where the same information exists in this definition.\n\nIf you wish the DevOps workflow to control the information and be versioned with Git, then you can use this information to push updates to the CMDB.  Just include processing of the __./well-known/devops.json__ into your deployment pipeline and post to the CMDB the updates.",
                         "example": "{\r\n    \"id\": \"AID07828923\",\r\n    \"name\": \"devops\",\r\n    \"url\": \"\"\r\n}"
                     },
                     "owner": {
@@ -1165,7 +1264,7 @@
                     },
                     "repository": {
                         "$ref": "#/components/schemas/repository-model",
-                        "description": "Repository links",
+                        "description": "Repository links\n\nRepositories includes:\n\n* Source version control management.  Examples include:\n    - Git\n    - Mercurial\n    - TFS\n* Artefact repositories. Examples include:\n    - Archiva\n    - Artifactory\n* Package managers. Exmaples include:\n    - npm\n    - NuGet\n    - Powershell Gallery\n    - Maven\n    - Apt \n    - Dnf ",
                         "properties": {
                             "guide": {
                                 "type": "string"
@@ -1204,9 +1303,7 @@
                             },
                             "tools": {
                                 "type": "array",
-                                "items": {
-
-                                }
+                                "items": {}
                             }
                         }
                     },
@@ -1321,9 +1418,7 @@
                                 "properties": {
                                     "pre": {
                                         "type": "array",
-                                        "items": {
-
-                                        }
+                                        "items": {}
                                     },
                                     "script": {
                                         "type": "string"
@@ -1356,9 +1451,7 @@
                                 "properties": {
                                     "pre": {
                                         "type": "array",
-                                        "items": {
-
-                                        }
+                                        "items": {}
                                     },
                                     "script": {
                                         "type": "string"
@@ -1374,51 +1467,252 @@
                         }
                     },
                     "apis": {
-                        "description": "List of OpenAPI definitions.\n\nThe list can include Git and REST versions, because before build the API might not be available\nas a REST service.\n\nA resource may have multiple definitions files or even different versions.",
+                        "description": "List of OpenAPI and/or AsyncAPI definitions.\n\nThe list can include Git and REST versions, because before build the API might not be available\nas a REST service.\n\nA resource may have multiple definitions files or even different versions.",
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/api-model"
                         }
-                    }
-                }
-            },
-            "devopsbrief-model": {
-                "description": "Used only for services and not part of the \n**rediops** definition ",
-                "required": [
-                    "unique_id",
-                    "version",
-                    "name",
-                    "guide",
-                    "self"
-                ],
-                "type": "object",
-                "properties": {
-                    "unique_id": {
-                        "description": "Unique identifier of he devops definitions",
-                        "type": "string"
                     },
-                    "version": {
-                        "description": "Version of the devops definition",
-                        "type": "string"
-                    },
-                    "name": {
-                        "description": "Name of the devops definition",
-                        "type": "string"
-                    },
-                    "guide": {
-                        "description": "Link to the guide of the devops definition",
-                        "type": "string"
-                    },
-                    "self": {
-                        "description": "Link to full details of rediops definition as \ndefined by **deveops.json**\"",
-                        "type": "string"
+                    "tags": {
+                        "description": "A list of free format tags for the root of the **devops** definition.\n\nThe tags can be used for things such as:\n* identify appication type\n* additional tools applicable",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 },
                 "example": {
+                    "devops_version": "some text",
                     "unique_id": "some text",
-                    "version": "some text",
+                    "created_on": "2018-02-10T09:30Z",
+                    "updated_on": "2018-02-10T09:30Z",
+                    "organisation": "some text",
                     "name": "some text",
-                    "guide": "some text"
+                    "asset": {
+                        "id": "some text",
+                        "name": "some text",
+                        "url": "some text"
+                    },
+                    "owner": {
+                        "email": "some text",
+                        "web": "some text",
+                        "slack": "some text",
+                        "twitter": "some text",
+                        "matrix": "some text",
+                        "name": "some text"
+                    },
+                    "guide": "some text",
+                    "repository": {
+                        "guide": "some text",
+                        "source": {
+                            "category": "SOURCE",
+                            "name": "some text",
+                            "url": "some text"
+                        },
+                        "artifact": {
+                            "category": "API",
+                            "name": "some text",
+                            "url": "some text"
+                        }
+                    },
+                    "dependency": {
+                        "guide": "some text",
+                        "apis": [
+                            {
+                                "guide": "some text",
+                                "url": "some text",
+                                "format": "AsyncAPI",
+                                "api": {
+                                    "category": "API",
+                                    "name": "some text",
+                                    "url": "some text"
+                                }
+                            },
+                            {
+                                "guide": "some text",
+                                "url": "some text",
+                                "format": "Custom",
+                                "api": {
+                                    "category": "ARTIFACT",
+                                    "name": "some text",
+                                    "url": "some text"
+                                }
+                            }
+                        ],
+                        "tools": [
+                            {
+                                "guide": "some text",
+                                "playbook": "some text",
+                                "commands": [
+                                    "some text",
+                                    "some text"
+                                ],
+                                "tool": {
+                                    "category": "COMMAND",
+                                    "name": "some text",
+                                    "url": "some text"
+                                }
+                            },
+                            {
+                                "guide": "some text",
+                                "playbook": "some text",
+                                "commands": [
+                                    "some text",
+                                    "some text"
+                                ],
+                                "tool": {
+                                    "category": "BUILD",
+                                    "name": "some text",
+                                    "url": "some text"
+                                }
+                            }
+                        ]
+                    },
+                    "build": [
+                        {
+                            "guide": "some text",
+                            "config": "some text",
+                            "script": "some text",
+                            "activity": {
+                                "category": "SOURCE",
+                                "name": "some text",
+                                "url": "some text"
+                            }
+                        },
+                        {
+                            "guide": "some text",
+                            "config": "some text",
+                            "script": "some text",
+                            "activity": {
+                                "category": "BUILD",
+                                "name": "some text",
+                                "url": "some text"
+                            }
+                        }
+                    ],
+                    "test": [
+                        {
+                            "guide": "some text",
+                            "config": "some text",
+                            "script": "some text",
+                            "activity": {
+                                "category": "API",
+                                "name": "some text",
+                                "url": "some text"
+                            }
+                        },
+                        {
+                            "guide": "some text",
+                            "config": "some text",
+                            "script": "some text",
+                            "activity": {
+                                "category": "CUSTOM",
+                                "name": "some text",
+                                "url": "some text"
+                            }
+                        }
+                    ],
+                    "health": {
+                        "guide": "some text",
+                        "api": [
+                            {
+                                "url": "some text",
+                                "status": 33,
+                                "response": "some text"
+                            },
+                            {
+                                "url": "some text",
+                                "status": 11,
+                                "response": "some text"
+                            }
+                        ]
+                    },
+                    "install": {
+                        "guide": "some text",
+                        "playbook": "some text",
+                        "commands": {
+                            "pre": [
+                                "some text",
+                                "some text"
+                            ],
+                            "script": "some text",
+                            "post": [
+                                "some text",
+                                "some text"
+                            ]
+                        },
+                        "deploy": {
+                            "category": "SOURCE",
+                            "name": "some text",
+                            "url": "some text"
+                        }
+                    },
+                    "refresh": {
+                        "guide": "some text",
+                        "playbook": "some text",
+                        "commands": {
+                            "pre": [
+                                "some text",
+                                "some text"
+                            ],
+                            "script": "some text",
+                            "post": [
+                                "some text",
+                                "some text"
+                            ]
+                        },
+                        "deploy": {
+                            "category": "ARTIFACT",
+                            "name": "some text",
+                            "url": "some text"
+                        }
+                    },
+                    "uninstall": {
+                        "guide": "some text",
+                        "playbook": "some text",
+                        "commands": {
+                            "pre": [
+                                "some text",
+                                "some text"
+                            ],
+                            "script": "some text",
+                            "post": [
+                                "some text",
+                                "some text"
+                            ]
+                        },
+                        "deploy": {
+                            "category": "API",
+                            "name": "some text",
+                            "url": "some text"
+                        }
+                    },
+                    "apis": [
+                        {
+                            "guide": "some text",
+                            "url": "some text",
+                            "format": "AsyncAPI",
+                            "api": {
+                                "category": "CUSTOM",
+                                "name": "some text",
+                                "url": "some text"
+                            }
+                        },
+                        {
+                            "guide": "some text",
+                            "url": "some text",
+                            "format": "WSDL",
+                            "api": {
+                                "category": "BUILD",
+                                "name": "some text",
+                                "url": "some text"
+                            }
+                        }
+                    ],
+                    "tags": [
+                        "some text",
+                        "some text"
+                    ]
                 }
             }
         },
