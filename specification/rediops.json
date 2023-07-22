@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Rediscover DevOps configuration",
-        "version": "0.0.4",
+        "version": "0.0.5",
         "description": "This document describes the specification of the \nproposed file **.well-known/devops.json** that can \nbe used in the DevOps CI/CD as identifier for\ninformation required by the tools.\n\nBy using the .well-known location, assumptions are\nreduced if not eliminated by the automation tools.\n\nThe end result is a design using HATEOS principles where further\ninformation on a resource can be obatined by following the bread crumbs of the \nrelationships in the **.well-known/devops.json** file.\n\nAutomation tools can also validate the information during \nsource commit to confirm the engineers are providing the necessary \ninformation and that it is valid.\n\nThe **devops.json** file has been defined using OpenAPI but that does not imply that\na real API needs to be deployed or used.  On the contrary it is unlikely that the main\ncopy stored on Git is accessed via a API service.  The **devops.json** file can also\ninclude a AsyncOpen definition, so the one definition **devops.json** definition\ncan support a single compute resource that handles both synchronous and asynchronous\nservice models for a subject domain.\n\nYou could build a catalogue service of all your **devops.json** definitions linked to\nGit definitions, but that is not a specification requirement.\n\nFor further information see https://github.com/meerkat-manor/rediOps",
         "contact": {
             "name": "Meerkat",
@@ -572,30 +572,22 @@
                         "description": "A web page URL for the owner.\n\nThe web page could refer to a team page.",
                         "type": "string"
                     },
-                    "slack": {
-                        "description": "Slack address of the owner.",
-                        "type": "string"
-                    },
-                    "twitter": {
-                        "description": "Twitter handle for the contact",
-                        "type": "string"
-                    },
-                    "matrix": {
-                        "description": "The matrix IM identifier of the owner",
-                        "type": "string",
-                        "example": "@devops:meerkat-manor.org"
-                    },
                     "name": {
                         "description": "The name of the owner.\n\nThis may be persons or teams name.",
                         "type": "string"
+                    },
+                    "contacts": {
+                        "description": "List of contacts\n\nThe list is allowed to contain duplicates of electronic \ncontact names (types) but not addresses. ",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/econtact-model"
+                        }
                     }
                 },
                 "example": {
+                    "name": "Head of RediOps",
                     "email": "devops@meerkatmanor-tech.org",
-                    "web": "meerkatmanor-tech.org",
-                    "slack": "",
-                    "twitter": "",
-                    "matrix": "@devops:meerkat-manor.org"
+                    "web": "meerkatmanor-tech.org"
                 }
             },
             "activity-model": {
@@ -713,6 +705,10 @@
                         "$ref": "#/components/schemas/engine-model",
                         "description": "The processor to execute the commands.\n\nFor example you can define it as \"powershell\" to execute script file with extension .ps1\n\nYou cannot combine different commands for different processors in the one tools set.  If you have different\nprocessors you can define multiple tools. \n\n_Note_: The engine category is **TOOL**",
                         "example": ""
+                    },
+                    "service_id": {
+                        "description": "A unique identifier (CI or UUID) for the tool definition.\nThis is not the instance identifier, such as the host name or IP (v4/v6)\nof the computing resource.\n\nThis can be something like the conguration item defned in a CMDDB\n",
+                        "type": "string"
                     }
                 },
                 "example": {
@@ -1904,7 +1900,8 @@
                 "required": [
                     "api",
                     "url",
-                    "format"
+                    "format",
+                    "name"
                 ],
                 "type": "object",
                 "properties": {
@@ -1913,7 +1910,7 @@
                         "type": "string"
                     },
                     "service_id": {
-                        "description": "A unique identifier (CI or UUID) for the service definition.\nThis is not the instance identifier, such as the host name or IP (v4/v6)\nof the computing rsource.\n\nThis can be something like the coguration item defned in a CMD definitiontring\n",
+                        "description": "A unique identifier (CI or UUID) for the service definition.\nThis is not the instance identifier, such as the host name or IP (v4/v6)\nof the computing resource.\n\nThis can be something like the conguration item defned in a CMDB\n",
                         "type": "string"
                     },
                     "url": {
@@ -1941,6 +1938,10 @@
                     "api": {
                         "$ref": "#/components/schemas/engine-model",
                         "description": "The engine that the Url refers to.  As the Url format is used by various \nprocessors, an engine value is required for proper processing.\n\nThe acceptable values will depend on the organisation, but the\nminimal values that need to be supported are:\n\n* GIT for Git located resources.  For this case the Git resource is assumed \n  to be in the Git repository for this DevOps resource if the prefix is not\n  HTTPS\n* REST for HTTP/S based web pages that are no explicitly handled by other engines\n\nOther possible values might be:\n\n* FILE for local or LAN based resources \n* S/FTP for FTP based URL resources\n \n_Note_: The engine category is **API**"
+                    },
+                    "name": {
+                        "description": "A short name for the API.  This is best auto populated\nfrom a CMDB based on the CI, but alternatively can be\nmanually entered.",
+                        "type": "string"
                     }
                 },
                 "example": {
@@ -1952,6 +1953,28 @@
                         "name": "some text",
                         "url": "some text"
                     }
+                }
+            },
+            "econtact-model": {
+                "description": "Electronic contact model\n\nThis type can be used to defined additional contact\nmethods such as Slack or Mastodon or Microsoft Teams.",
+                "required": [
+                    "name",
+                    "address"
+                ],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "description": "This is the name of the electronic name used for the contact.\n\nThe names have not been enumerated so as to allow additions and new\nentrants.\n\nFor example Slack might be defined as SLACK.\n\nThe choice of names are set by the consumer, though the recommended names\nfor common contact names are:\n\n* SMS\n* SLACK\n* TWITTER\n* MASTODON\n* MATRIX\n* MSTEAMS\n* JABBER\n* THREADS\n\n_Note_: Uppercase name have been selected to denote these constants",
+                        "type": "string"
+                    },
+                    "address": {
+                        "description": "The electronic address",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "name": "MSTEAMS",
+                    "address": "meerkat@merebox.com"
                 }
             }
         },
