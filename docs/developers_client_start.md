@@ -48,12 +48,18 @@ sequenceDiagram
 
     Note over git, devops: The OpenAPI and devops files are stored in Git
 
+    alt If no OpenAPI dependency linked
+    vsc -) devops: Update OpenAPI dependency entry
+    end
+
     vsc ->>+ term: start
     term ->>+ qaskx: New CI
     qaskx ->>+ devops: Read 
     devops -->>- qaskx: Contents
-    qaskx ->>+ oas3f: Read 
+    loop Read called dependencies
+    qaskx ->>+ oas3f: Read dependency
     oas3f -->>- qaskx: Contents
+    end
     Note over cmdb, git: qaskx devops ci cmd
     qaskx ->>+ cmdb: 
     cmdb -->>- qaskx: New CI value
@@ -62,27 +68,30 @@ sequenceDiagram
 
     term ->>+ qaskx: Generate code
     Note over qaskx, cmdb: qaskx gen client cmd
-    qaskx ->>+ devops: Read 
+    qaskx ->>+ devops: Read dependency list
     devops -->>- qaskx: Contents
-    qaskx ->>+ oas3f: Read 
+    loop Read called dependencies
+    qaskx ->>+ oas3f: Read dependency
     oas3f -->>- qaskx: Contents
     qaskx -) qaskx: Auto generate client code
+    end
     qaskx -) qaskx: Auto generate sequence diagram
-    qaskx -) qaskx: Auto generate gateway infra
     qaskx -) qaskx: Auto generate feature flags
     qaskx -) devops: Auto update entries, including build, test
     qaskx -->>- term: Success
 
-    alt Register API if not already done
+    alt Register using API dependencies if not already done
 
-    term ->>+ qaskx: Register API
+    term ->>+ qaskx: Register API dependencies
     Note over cmdb, git: qaskx devops register cmd
     qaskx ->>+ devops: Read 
     devops -->>- qaskx: Contents
+    loop Read called dependencies
     qaskx ->>+ oas3f: Read 
     oas3f -->>- qaskx: Contents
     qaskx ->>+ apip: 
-    apip -->>- qaskx: Registered
+    apip -->>- qaskx: Registered as consumer
+    end
     qaskx -) devops: Auto update API entry
     qaskx -->>- term: Success
 
@@ -152,9 +161,9 @@ sequenceDiagram
     vsc -) vsc: Manually write Gateway infra
     vsc -) vsc: Manually write feature flags
 
-    alt Register API if not already done
+    alt Register using API dependencies if not already done
 
-    dev ->>+ apip: Register API
+    dev ->>+ apip: Register as consuming APIs
     apip -->>- dev: Registered
 
     end
@@ -181,6 +190,9 @@ expected to have been done.
 
 
 # Reading Notes
+
+For automation, some activities can be performed by GitActions calling
+qaskx-cli.
 
 The Visual Studio Code, CMDB and Github components can be substituted for 
 other software products such IntelliJ and Bitbucket.

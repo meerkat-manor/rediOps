@@ -53,6 +53,14 @@ sequenceDiagram
     term ->>+ qaskx: New CI
     qaskx ->>+ devops: Read 
     devops -->>- qaskx: Contents
+
+    alt If no OpenAPI linked
+    qaskx ->>+ git:  
+    Note over oas3f, devops: Scan for OpenAPI file in Git
+    git -->>- qaskx: 
+    qaskx -) devops: Update OpenAPI entry
+    end
+
     qaskx ->>+ oas3f: Read 
     oas3f -->>- qaskx: Contents
     Note over cmdb, git: qaskx devops ci cmd
@@ -65,6 +73,14 @@ sequenceDiagram
     Note over qaskx, cmdb: qaskx gen server cmd
     qaskx ->>+ devops: Read 
     devops -->>- qaskx: Contents
+
+    alt If no OpenAPI linked
+    qaskx ->>+ git:  
+    Note over oas3f, devops: Scan for OpenAPI file in Git
+    git -->>- qaskx: 
+    qaskx -) devops: Update OpenAPI entry
+    end
+
     qaskx ->>+ oas3f: Read 
     oas3f -->>- qaskx: Contents
     qaskx -) qaskx: Auto generate server code
@@ -139,6 +155,10 @@ sequenceDiagram
     git -->>- vsc : Cloned, project opened
 
     vsc -) devops: Update CI entry
+
+    alt If no OpenAPI linked
+    vsc -) devops: Update OpenAPI entry
+    end
 
     vsc ->>+ term: start
     Note over git, oas3: Set generation parameters
