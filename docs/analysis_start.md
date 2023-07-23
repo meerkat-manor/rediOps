@@ -14,8 +14,8 @@ service domain scope have already been agreed before starting
 to define the API.
 
 Knowing the information to fetch or tasks that need to be performed
-will assist in comleting the API specification.  This information 
-could be captured in the API specification so as to avoid duplciate 
+will assist in completing the API specification.  This information 
+could be captured in the API specification so as to avoid duplicate 
 sources of information that needs to be synchronised.
 
 Information in the OpenAPI specification can be extracted and rendered
@@ -55,7 +55,7 @@ sequenceDiagram
 ```
 
 When creating the OpenAPI specification the information to include:
-* Summary and abtstract
+* Summary and abstract
 * Version
 * Descriptions for fields
 * Field attributes including mandatory, type, enumeration and rules such as size
@@ -82,7 +82,7 @@ server code is built.
 
 # Reading Notes
 
-The ApiCurio and Github components can be substitued for 
+The ApiCurio and Github components can be substituted for 
 other software products uch as Swagger Editor and Bitbucket 
 that provide similar capabilities.
 

@@ -1,7 +1,7 @@
 # Developer update flow
 
-_This document is intended to cover the scenario where the **rediops** 
-contents change including references to OpenAPI specifications._
+_This document is intended to cover the scenario where the **devops** 
+file contents change including references to OpenAPI specifications._
 
 _This document under construction._
 

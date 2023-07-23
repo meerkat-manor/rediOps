@@ -20,7 +20,7 @@ The assumptions for this documents are:
 
 ### Automation
 
-The sequence of automation activity using **rediops** and **qaskx-cli** is 
+The sequence of automation activity using **devops** file and **qaskx-cli** is 
 as follows.
 
 The Qaskx command line tool needs to be installed on the developer machine
@@ -35,9 +35,9 @@ sequenceDiagram
     participant qaskx as qaskx-cli
     participant cmdb as CMDB
     participant git as Github
-    link git: GitHub @ https://github.com/meerkat-manor/rediOps
+    link git: GitHub @ https://github.com/meerkat-manor/devops
     participant oas3f as OpenAPI file
-    participant rediops as rediops file
+    participant devops as devops file
     participant apip as API portal
 
     dev ->>+ vsc: start IDE
@@ -46,44 +46,44 @@ sequenceDiagram
     vsc ->>+ git : 
     git -->>- vsc : Cloned, project opened
 
-    Note over git, rediops: The OpenAPI and redops files are stored in Git
+    Note over git, devops: The OpenAPI and devops files are stored in Git
 
     vsc ->>+ term: start
     term ->>+ qaskx: New CI
-    qaskx ->>+ rediops: Read 
-    rediops -->>- qaskx: Contents
+    qaskx ->>+ devops: Read 
+    devops -->>- qaskx: Contents
     qaskx ->>+ oas3f: Read 
     oas3f -->>- qaskx: Contents
-    Note over cmdb, git: qaskx rediops ci cmd
+    Note over cmdb, git: qaskx devops ci cmd
     qaskx ->>+ cmdb: 
     cmdb -->>- qaskx: New CI value
-    qaskx -) rediops: Update CI entry
+    qaskx -) devops: Update CI entry
     qaskx -->>- term: Success
 
     term ->>+ qaskx: Generate code
     Note over qaskx, cmdb: qaskx gen client cmd
-    qaskx ->>+ rediops: Read 
-    rediops -->>- qaskx: Contents
+    qaskx ->>+ devops: Read 
+    devops -->>- qaskx: Contents
     qaskx ->>+ oas3f: Read 
     oas3f -->>- qaskx: Contents
     qaskx -) qaskx: Auto generate client code
     qaskx -) qaskx: Auto generate sequence diagram
     qaskx -) qaskx: Auto generate gateway infra
     qaskx -) qaskx: Auto generate feature flags
-    qaskx -) rediops: Auto update entries, including build, test
+    qaskx -) devops: Auto update entries, including build, test
     qaskx -->>- term: Success
 
-    alt Regsiter API if not already done
+    alt Register API if not already done
 
     term ->>+ qaskx: Register API
-    Note over cmdb, git: qaskx rediops register cmd
-    qaskx ->>+ rediops: Read 
-    rediops -->>- qaskx: Contents
+    Note over cmdb, git: qaskx devops register cmd
+    qaskx ->>+ devops: Read 
+    devops -->>- qaskx: Contents
     qaskx ->>+ oas3f: Read 
     oas3f -->>- qaskx: Contents
     qaskx ->>+ apip: 
     apip -->>- qaskx: Registered
-    qaskx -) rediops: Auto update API entry
+    qaskx -) devops: Auto update API entry
     qaskx -->>- term: Success
 
     end
@@ -101,7 +101,7 @@ sequenceDiagram
 ### Manual
 
 The equivalent sequence of manual activity, non qaskx actions is as follows.
-The **rediops** file is still used.  Without **rediops** file you will 
+The **devops** file is still used.  Without **devops** file you will 
 follow whatever your existing process is and recorded the necessary 
 details in various documents
 
@@ -117,9 +117,9 @@ sequenceDiagram
     link vsc: Visual Studio @ https://code.visualstudio.com/
     participant term as Terminal
     participant git as Github
-    link git: GitHub @ https://github.com/meerkat-manor/rediOps
+    link git: GitHub @ https://github.com/meerkat-manor/devops
     participant oas3f as OpenAPI file
-    participant rediops as rediops file
+    participant devops as devops file
     participant oas3 as OpenAPI tool
     participant apip as API portal
 
@@ -129,7 +129,7 @@ sequenceDiagram
     cmdb -->> cmdb: Create CI entry
     cmdb -->>- dev: Close, noting CI value
 
-    Note over git, rediops: The rediops file is stored in Git
+    Note over git, devops: The devops file is stored in Git
 
     dev ->>+ vsc: start IDE
 
@@ -137,7 +137,7 @@ sequenceDiagram
     vsc ->>+ git : 
     git -->>- vsc : Cloned, project opened
 
-    vsc -) rediops: Update CI entry
+    vsc -) devops: Update CI entry
 
     vsc ->>+ term: start
     Note over git, oas3: Set generation parameters
@@ -152,14 +152,14 @@ sequenceDiagram
     vsc -) vsc: Manually write Gateway infra
     vsc -) vsc: Manually write feature flags
 
-    alt Regsiter API if not already done
+    alt Register API if not already done
 
     dev ->>+ apip: Register API
     apip -->>- dev: Registered
 
     end
 
-    vsc -) rediops: Manually update entries
+    vsc -) devops: Manually update entries
 
     vsc ->>+ git: Commit
     git --) git: Trigger GitActions for lint, gateway, features, etc 
@@ -182,6 +182,6 @@ expected to have been done.
 
 # Reading Notes
 
-The Visual Studio Code, CMDB and Github components can be substitued for 
+The Visual Studio Code, CMDB and Github components can be substituted for 
 other software products such IntelliJ and Bitbucket.
 
