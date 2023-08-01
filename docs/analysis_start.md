@@ -74,13 +74,17 @@ When the specification changes the version will change according
 to semantic versioning rules.  
 
 The OpenAPI definition generated is next used in the 
-[developer client start](developers_client_start.md) or
-[developer server start](developers_server_start.md) flow.
+[developer client start](developer_client_start.md) or
+[developer server start](developer_server_start.md) flow.
 
 The client will need to consume a mock service until the
 server code is built.
 
 # Reading Notes
+
+Further automation can be achieved by GitActions calling
+qaskx-cli, such as registering the OpenAPI specification in the 
+devops file.
 
 The ApiCurio and Github components can be substituted for 
 other software products uch as Swagger Editor and Bitbucket 

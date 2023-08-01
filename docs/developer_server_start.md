@@ -1,8 +1,8 @@
-# Front end client developer flow (start)
+# Back end server developer flow (start)
 
-This is the initialisation of the front end 
-client code.  Coding the server is covered in document
-[developers server start](developers_server_start.md)
+This is the initialisation of the back end 
+code.  Coding the client is covered in document
+[developers client start](developers_client_start.md)
 
 The [analysis start](analysis_start.md) is a pre-requisite for
 this flow.
@@ -15,6 +15,7 @@ The assumptions for this documents are:
 * no API coding has commenced
 * Visual Studio Code has been installed
 * Developer has access to the API editor viewer for the OpenAPI specification
+
 
 ## Sequence Diagram
 
@@ -48,18 +49,21 @@ sequenceDiagram
 
     Note over git, devops: The OpenAPI and devops files are stored in Git
 
-    alt If no OpenAPI dependency linked
-    vsc -) devops: Update OpenAPI dependency entry
-    end
-
     vsc ->>+ term: start
     term ->>+ qaskx: New CI
     qaskx ->>+ devops: Read 
     devops -->>- qaskx: Contents
-    loop Read called dependencies
-    qaskx ->>+ oas3f: Read dependency
-    oas3f -->>- qaskx: Contents
+
+    alt If no OpenAPI linked
+    qaskx ->>+ git:  
+    Note over oas3f, devops: qaskx-cli rediops scan command
+    Note over oas3f, devops: Scan for OpenAPI file in Git
+    git -->>- qaskx: 
+    qaskx -) devops: Update OpenAPI entry
     end
+
+    qaskx ->>+ oas3f: Read 
+    oas3f -->>- qaskx: Contents
     Note over cmdb, git: qaskx devops ci cmd
     qaskx ->>+ cmdb: 
     cmdb -->>- qaskx: New CI value
@@ -67,31 +71,37 @@ sequenceDiagram
     qaskx -->>- term: Success
 
     term ->>+ qaskx: Generate code
-    Note over qaskx, cmdb: qaskx gen client cmd
-    qaskx ->>+ devops: Read dependency list
+    Note over qaskx, cmdb: qaskx-cli gen server cmd
+    qaskx ->>+ devops: Read 
     devops -->>- qaskx: Contents
-    loop Read called dependencies
-    qaskx ->>+ oas3f: Read dependency
-    oas3f -->>- qaskx: Contents
-    qaskx -) qaskx: Auto generate client code
+
+    alt If no OpenAPI linked
+    qaskx ->>+ git:  
+    Note over oas3f, devops: qaskx-cli rediops scan command
+    Note over oas3f, devops: Scan for OpenAPI file in Git
+    git -->>- qaskx: 
+    qaskx -) devops: Update OpenAPI entry
     end
+
+    qaskx ->>+ oas3f: Read 
+    oas3f -->>- qaskx: Contents
+    qaskx -) qaskx: Auto generate server code
     qaskx -) qaskx: Auto generate sequence diagram
+    qaskx -) qaskx: Auto generate gateway infra
     qaskx -) qaskx: Auto generate feature flags
     qaskx -) devops: Auto update entries, including build, test
     qaskx -->>- term: Success
 
-    alt Register using API dependencies if not already done
+    alt Register API if not already done
 
-    term ->>+ qaskx: Register API dependencies
-    Note over cmdb, git: qaskx devops register cmd
+    term ->>+ qaskx: Register API
+    Note over cmdb, git: qaskx-cli rediops register cmd
     qaskx ->>+ devops: Read 
     devops -->>- qaskx: Contents
-    loop Read called dependencies
     qaskx ->>+ oas3f: Read 
     oas3f -->>- qaskx: Contents
     qaskx ->>+ apip: 
-    apip -->>- qaskx: Registered as consumer
-    end
+    apip -->>- qaskx: Registered
     qaskx -) devops: Auto update API entry
     qaskx -->>- term: Success
 
@@ -110,7 +120,7 @@ sequenceDiagram
 ### Manual
 
 The equivalent sequence of manual activity, non qaskx actions is as follows.
-The **devops** file is still used.  Without **devops** file you will 
+The **devops** file is still used. Without **devops** file you will 
 follow whatever your existing process is and recorded the necessary 
 details in various documents
 
@@ -133,12 +143,12 @@ sequenceDiagram
     participant apip as API portal
 
 
-    Note over cmdb, vsc: Create new CI entry for Client  
+    Note over cmdb, vsc: Create new CI entry for API 
     dev ->>+ cmdb: Access UI
     cmdb -->> cmdb: Create CI entry
     cmdb -->>- dev: Close, noting CI value
 
-    Note over git, devops: The devops file is stored in Git
+    Note over git, devops: The OpenAPI and devops files are stored in Git
 
     dev ->>+ vsc: start IDE
 
@@ -148,6 +158,10 @@ sequenceDiagram
 
     vsc -) devops: Update CI entry
 
+    alt If no OpenAPI linked
+    vsc -) devops: Update OpenAPI entry
+    end
+
     vsc ->>+ term: start
     Note over git, oas3: Set generation parameters
     term ->>+ oas3: Generate code cmd
@@ -156,14 +170,14 @@ sequenceDiagram
     oas3 -->>- term: Success
     term -->- vsc: close
 
-    vsc -) vsc: Update client code with defaults
+    vsc -) vsc: Update server code with defaults
     vsc -) vsc: Manually write sequence diagrams
     vsc -) vsc: Manually write Gateway infra
     vsc -) vsc: Manually write feature flags
 
-    alt Register using API dependencies if not already done
+    alt Register API if not already done
 
-    dev ->>+ apip: Register as consuming APIs
+    dev ->>+ apip: Register API
     apip -->>- dev: Registered
 
     end
@@ -183,10 +197,7 @@ sequenceDiagram
 
 At the end of this flow the basic code stubs exist and have been committed
 to Github.  The code can execute and will return not implemented
-response results if the client is a non UI, headless consumer of the API.
-
-For clients that will have a UI, the code will not work as no UI coding is
-expected to have been done.
+response results.
 
 
 # Reading Notes
