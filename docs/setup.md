@@ -16,6 +16,7 @@ associated capabilities.
 
 * A Git repository server - Github, Gitea
 * Rights to create a Git repo and push content to the remote Git repo
+* Git installed on local desktop
 * Integrated development environment (IDE) software - Visual Studio Code, IntelliJ
 * Access to an OpenAPI editor - ApiCurio, Swagger UI
 * Installed **qaskx-cli** tool
