@@ -45,6 +45,9 @@ sequenceDiagram
 Once the OpenAPI definition has been updated the server code needs to be
 re-generated as the publisher of the API.
 
+**A server can also be a consumer of other APIs in which case it needs updating
+when downstream API specifications change.**
+
 ```mermaid
 ---
 title: Server development update task flow
@@ -84,15 +87,30 @@ sequenceDiagram
     end
     qaskx -->>- term: Success
 
+    opt
+
+    term ->>+ qaskx: Generate code
+    Note over qaskx, cmdb: qaskx-cli gen client cmd
+    qaskx ->>+ devops: Read dependency list
+    devops -->>- qaskx: Contents
+    loop Read called dependencies
+    qaskx ->>+ oas3f: Read dependency
+    oas3f -->>- qaskx: Contents
+    qaskx -) qaskx: Auto generate client code
+    end
+    qaskx -->>- term: Success
+
+    end
+
     term -->- vsc: close
 
-    rect grey
+    rect lightgrey
     Note over vsc, qaskx: Code updates to use the updated OpenAPI definition
     vsc -->> vsc: Code update
     vsc -->> vsc: Local build
     vsc -->> vsc: Local test
     end
-    
+
     vsc ->>+ git: Commit
     git --) git: Trigger GitActions for lint, gateway, features, etc 
     git ->>- vsc: Success
@@ -147,7 +165,7 @@ sequenceDiagram
 
     term -->- vsc: close
 
-    rect grey
+    rect lightgrey
     Note over vsc, qaskx: Code updates to use the updated OpenAPI definition
     vsc -->> vsc: Code update
     vsc -->> vsc: Local build

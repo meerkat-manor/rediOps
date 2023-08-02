@@ -24,6 +24,9 @@ The assumptions for this documents are:
 The sequence of automation activity using **devops** file and **qaskx-cli** is 
 as follows.
 
+**A server can also be a consumer of other APIs in which case it needs to generate
+when downstream API specifications client code.**
+
 The Qaskx command line tool needs to be installed on the developer machine
 
 ```mermaid
@@ -94,13 +97,28 @@ sequenceDiagram
     qaskx -) devops: Auto update entries, including build, test
     qaskx -->>- term: Success
 
-    rect grey
+    opt
+
+    term ->>+ qaskx: Generate code
+    Note over qaskx, cmdb: qaskx-cli gen client cmd
+    qaskx ->>+ devops: Read dependency list
+    devops -->>- qaskx: Contents
+    loop Read called dependencies
+    qaskx ->>+ oas3f: Read dependency
+    oas3f -->>- qaskx: Contents
+    qaskx -) qaskx: Auto generate client code
+    end
+    qaskx -->>- term: Success
+
+    end
+
+    rect lightgrey
     Note over vsc, qaskx: Developer codes to use the OpenAPI definition, with base code in place
     vsc -->> vsc: Code update
     vsc -->> vsc: Local build
     vsc -->> vsc: Local test
     end 
-    
+
     alt Register API if not already done
 
     term ->>+ qaskx: Register API

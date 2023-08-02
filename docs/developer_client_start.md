@@ -101,13 +101,13 @@ sequenceDiagram
 
     term -->- vsc: close
 
-    rect grey
+    rect lightgrey
     Note over vsc, qaskx: Developer codes to use the OpenAPI definition, with base code in place
     vsc -->> vsc: Code update
     vsc -->> vsc: Local build
     vsc -->> vsc: Local test
     end 
-    
+
     vsc ->>+ git: Commit
     git --) git: Trigger GitActions for lint, gateway, features, etc 
     git ->>- vsc: Success
