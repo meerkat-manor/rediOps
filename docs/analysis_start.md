@@ -25,7 +25,9 @@ size and description.
 ## Sequence Diagram
 
 ```mermaid
-
+---
+title: Business Analyst task flow
+---
 sequenceDiagram
 
     actor ba as Business Analyst

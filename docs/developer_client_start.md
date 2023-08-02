@@ -26,7 +26,9 @@ as follows.
 The Qaskx command line tool needs to be installed on the developer machine
 
 ```mermaid
-
+---
+title: Client development task flow
+---
 sequenceDiagram
 
     actor dev as Developer
@@ -53,17 +55,17 @@ sequenceDiagram
     end
 
     vsc ->>+ term: start
-    term ->>+ qaskx: New CI
+    term ->>+ qaskx: New CMDB CI
     qaskx ->>+ devops: Read 
     devops -->>- qaskx: Contents
     loop Read called dependencies
     qaskx ->>+ oas3f: Read dependency
     oas3f -->>- qaskx: Contents
     end
-    Note over cmdb, git: qaskx-cli rediops ci cmd
+    Note over cmdb, git: qaskx-cli rediops cmdb cmd
     qaskx ->>+ cmdb: 
-    cmdb -->>- qaskx: New CI value
-    qaskx -) devops: Update CI entry
+    cmdb -->>- qaskx: New CMDB CI value
+    qaskx -) devops: Update CMDB CI entry
     qaskx -->>- term: Success
 
     term ->>+ qaskx: Generate code
@@ -99,6 +101,13 @@ sequenceDiagram
 
     term -->- vsc: close
 
+    rect grey
+    Note over vsc, qaskx: Developer codes to use the OpenAPI definition, with base code in place
+    vsc -->> vsc: Code update
+    vsc -->> vsc: Local build
+    vsc -->> vsc: Local test
+    end 
+    
     vsc ->>+ git: Commit
     git --) git: Trigger GitActions for lint, gateway, features, etc 
     git ->>- vsc: Success
@@ -117,7 +126,9 @@ details in various documents
 The OpenAPI tool needs to be installed on the developer machine.
 
 ```mermaid
-
+---
+title: Client development task flow
+---
 sequenceDiagram
 
     actor dev as Developer
@@ -133,9 +144,9 @@ sequenceDiagram
     participant apip as API portal
 
 
-    Note over cmdb, vsc: Create new CI entry for Client  
+    Note over cmdb, vsc: Create new CMDB CI entry for Client  
     dev ->>+ cmdb: Access UI
-    cmdb -->> cmdb: Create CI entry
+    cmdb -->> cmdb: Create CMDB CI entry
     cmdb -->>- dev: Close, noting CI value
 
     Note over git, devops: The devops file is stored in Git
@@ -146,7 +157,7 @@ sequenceDiagram
     vsc ->>+ git : 
     git -->>- vsc : Cloned, project opened
 
-    vsc -) devops: Update CI entry
+    vsc -) devops: Update CMDB CI entry
 
     vsc ->>+ term: start
     Note over git, oas3: Set generation parameters

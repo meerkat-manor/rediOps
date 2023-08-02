@@ -27,7 +27,9 @@ as follows.
 The Qaskx command line tool needs to be installed on the developer machine
 
 ```mermaid
-
+---
+title: Server development task flow
+---
 sequenceDiagram
 
     actor dev as Developer
@@ -50,13 +52,13 @@ sequenceDiagram
     Note over git, devops: The OpenAPI and devops files are stored in Git
 
     vsc ->>+ term: start
-    term ->>+ qaskx: New CI
+    term ->>+ qaskx: New CMDB CI
     qaskx ->>+ devops: Read 
     devops -->>- qaskx: Contents
 
     alt If no OpenAPI linked
     qaskx ->>+ git:  
-    Note over oas3f, devops: qaskx-cli rediops scan command
+    Note over oas3f, devops: qaskx-cli rediops scan cmd
     Note over oas3f, devops: Scan for OpenAPI file in Git
     git -->>- qaskx: 
     qaskx -) devops: Update OpenAPI entry
@@ -64,9 +66,9 @@ sequenceDiagram
 
     qaskx ->>+ oas3f: Read 
     oas3f -->>- qaskx: Contents
-    Note over cmdb, git: qaskx devops ci cmd
+    Note over cmdb, git: qaskx-cli rediops cmdb cmd
     qaskx ->>+ cmdb: 
-    cmdb -->>- qaskx: New CI value
+    cmdb -->>- qaskx: New CMDB CI value
     qaskx -) devops: Update CI entry
     qaskx -->>- term: Success
 
@@ -77,7 +79,7 @@ sequenceDiagram
 
     alt If no OpenAPI linked
     qaskx ->>+ git:  
-    Note over oas3f, devops: qaskx-cli rediops scan command
+    Note over oas3f, devops: qaskx-cli rediops scan cmd
     Note over oas3f, devops: Scan for OpenAPI file in Git
     git -->>- qaskx: 
     qaskx -) devops: Update OpenAPI entry
@@ -92,6 +94,13 @@ sequenceDiagram
     qaskx -) devops: Auto update entries, including build, test
     qaskx -->>- term: Success
 
+    rect grey
+    Note over vsc, qaskx: Developer codes to use the OpenAPI definition, with base code in place
+    vsc -->> vsc: Code update
+    vsc -->> vsc: Local build
+    vsc -->> vsc: Local test
+    end 
+    
     alt Register API if not already done
 
     term ->>+ qaskx: Register API
@@ -127,7 +136,9 @@ details in various documents
 The OpenAPI tool needs to be installed on the developer machine.
 
 ```mermaid
-
+---
+title: Server development task flow
+---
 sequenceDiagram
 
     actor dev as Developer
@@ -143,7 +154,7 @@ sequenceDiagram
     participant apip as API portal
 
 
-    Note over cmdb, vsc: Create new CI entry for API 
+    Note over cmdb, vsc: Create new CMDB CI entry for API 
     dev ->>+ cmdb: Access UI
     cmdb -->> cmdb: Create CI entry
     cmdb -->>- dev: Close, noting CI value
@@ -156,7 +167,7 @@ sequenceDiagram
     vsc ->>+ git : 
     git -->>- vsc : Cloned, project opened
 
-    vsc -) devops: Update CI entry
+    vsc -) devops: Update CMDB CI entry
 
     alt If no OpenAPI linked
     vsc -) devops: Update OpenAPI entry

@@ -7,7 +7,7 @@ the repetitious tasks or at least reduce the number of keystrokes.
 
 The documents should be read in the following sequence:
 
-* [setup](setup.md) Once of desktop setup
+* [setup](setup.md) Once off desktop setup
 * [project start](project_start.md) Starting a new project or initiative
 * [analysis start](analysis_start.md) Focus on technical API analysis
 * [developer server_start](developer_server_start.md) Initial server coding
