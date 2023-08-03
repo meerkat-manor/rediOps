@@ -1,0 +1,17 @@
+{
+    "GitProvider": "git",
+    "GitHost": "https://tea.example.com",
+    "GitApi": "https://tea.merebox.com/api/v1",
+    "GitOrg": "Wardrobe",
+    "GitRepoUser": "meerkat",
+    "GitBranch": "main",
+    "GitUserEmail": "meerkat@example.com",
+    "Organisation": "Witch & Wardrobe",
+    "TemplateHost": "",
+    "TemplateFolder": "Xtreme/Folder/Template",
+    "Name": "Sir Meerkat",
+    "ServiceOwner": "Meerkat team, Sydney",
+    "ServiceOwnerEmail": "Meerkat.Team@example.com",
+    "PrimaryProgramLanguage": "go",
+    "LintApiLevel": ""
+}
