@@ -1,7 +1,19 @@
-# Project flow
+# Project flow (start)
 
-_This document under construction._
+The project inception is when the scope of the project is
+defined, but design and coding does not start immediately.
 
+**Pause and reflect before starting to design and pause again
+to reflect on the design before starting to code.**
+
+With experience you will find that many times your initial gut instinct
+on design is correct, but **many is not the same as always**.  With the right
+tools, refactoring does allow you to change designs/code quickly - but a 
+pause over lunch or a night's sleep  costs little and can help
+you organise your approach.
+
+The sequence diagram below starts when you have an idea that you need
+new code and existing code cannot be modified to suit your needs.
 
 ## Sequence diagram
 
