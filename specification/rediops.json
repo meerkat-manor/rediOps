@@ -2,8 +2,8 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Rediscover DevOps configuration",
-        "version": "0.0.5",
-        "description": "This document describes the specification of the \nproposed file **.well-known/devops.json** that can \nbe used in the DevOps CI/CD as identifier for\ninformation required by the tools.\n\nBy using the .well-known location, assumptions are\nreduced if not eliminated by the automation tools.\n\nThe end result is a design using HATEOS principles where further\ninformation on a resource can be obatined by following the bread crumbs of the \nrelationships in the **.well-known/devops.json** file.\n\nAutomation tools can also validate the information during \nsource commit to confirm the engineers are providing the necessary \ninformation and that it is valid.\n\nThe **devops.json** file has been defined using OpenAPI but that does not imply that\na real API needs to be deployed or used.  On the contrary it is unlikely that the main\ncopy stored on Git is accessed via a API service.  The **devops.json** file can also\ninclude a AsyncOpen definition, so the one definition **devops.json** definition\ncan support a single compute resource that handles both synchronous and asynchronous\nservice models for a subject domain.\n\nYou could build a catalogue service of all your **devops.json** definitions linked to\nGit definitions, but that is not a specification requirement.\n\nFor further information see https://github.com/meerkat-manor/rediOps",
+        "version": "0.3.0",
+        "description": "This document describes the specification of the \nproposed file **.well-known/devops.json** that can \nbe used in the DevOps CI/CD as identifier for\ninformation required by the tools. \n\nBy using the .well-known location, assumptions are\nreduced if not eliminated by the automation tools.\n\nThe end result is a design using HATEOS principles where further\ninformation on a resource can be obatined by following the bread crumbs of the \nrelationships in the **.well-known/devops.json** file.\n\nAutomation tools can also validate the information during \nsource commit to confirm the engineers are providing the necessary \ninformation and that it is valid.\n\nThe **devops.json** file has been defined using OpenAPI but that does not imply that\na real API needs to be deployed or used.  On the contrary it is unlikely that the main\ncopy stored on Git is accessed via a API service.  The **devops.json** file can also\ninclude a AsyncOpen definition, so the one definition **devops.json** definition\ncan support a single compute resource that handles both synchronous and asynchronous\nservice models for a subject domain.\n\nYou could build a catalogue service of all your **devops.json** definitions linked to\nGit definitions, but that is not a specification requirement.\n\nFor further information see https://github.com/meerkat-manor/rediOps",
         "contact": {
             "name": "Meerkat",
             "url": "https://github.com/meerkat-manor/rediOps",
@@ -217,6 +217,13 @@
                         "description": "Errors with request"
                     },
                     "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error-model"
+                                }
+                            }
+                        },
                         "description": "The required Devops recor with the requested identity wasnot found."
                     },
                     "500": {
@@ -243,7 +250,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/healthbase-model"
+                                    "$ref": "#/components/schemas/error-model"
                                 }
                             }
                         },
@@ -512,6 +519,7 @@
             ]
         },
         "/.well-known/devops.json": {
+            "summary": "Fetch the \"devops\" file for the service",
             "description": "This fetches the **devops.json** file for this service,\n\nThis definition is only applicable if the **deveops** is\npublished as a service outside of the source code.",
             "get": {
                 "tags": [
@@ -564,20 +572,27 @@
                 "properties": {
                     "email": {
                         "description": "The email adress of the owner.\n\nThe email address could be a distribution list.",
+                        "maxLength": 100,
                         "minLength": 6,
                         "type": "string",
                         "example": "emilia.jackson@devops.example.com"
                     },
                     "web": {
                         "description": "A web page URL for the owner.\n\nThe web page could refer to a team page.",
+                        "maxLength": 300,
+                        "minLength": 10,
                         "type": "string"
                     },
                     "name": {
                         "description": "The name of the owner.\n\nThis may be persons or teams name.",
+                        "maxLength": 100,
+                        "minLength": 1,
                         "type": "string"
                     },
                     "contacts": {
                         "description": "List of contacts\n\nThe list is allowed to contain duplicates of electronic \ncontact names (types) but not addresses. ",
+                        "maxItems": 10,
+                        "uniqueItems": true,
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/econtact-model"
@@ -592,7 +607,7 @@
             },
             "activity-model": {
                 "title": "activity",
-                "description": "",
+                "description": "Describes the activity that the engine will perform",
                 "required": [
                     "activity"
                 ],
@@ -600,6 +615,7 @@
                 "properties": {
                     "guide": {
                         "description": "Link to documentation",
+                        "maxLength": 500,
                         "type": "string",
                         "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/activity.md"
                     },
@@ -608,7 +624,8 @@
                         "type": "string"
                     },
                     "script": {
-                        "description": "A script file that is executed to perform the activity.\n\nThe choice of processing engine is up to the organisation, or \nsome assumptions can be made based on file extension.\n\nFor example:\n\n* .sh = Bash\n* .ps1 = PowerShell\n* .bat = MS DOS command",
+                        "description": "A command or script file that is executed to perform the activity.\n\nThe choice of activity processing engine is up to the organisation, or \nsome assumptions can be made based on file extension.\n\nFor example:\n\n* .sh = Bash\n* .ps1 = PowerShell\n* .bat = MS DOS command\n\nThe activity engine name along with catageory can link to\nconfiguration item for qualifying the processing engine.\n\nThe directory where the command is executed is\nbased on the root of the repository and if not found\nthen the current directory is used.\n\nThere is a maximum length of the string that can be stored.",
+                        "maxLength": 200,
                         "type": "string",
                         "example": "/build/builder.sh"
                     },
@@ -617,6 +634,15 @@
                         "description": "Engine used for activties.\n\nFor example the engine name can be:\n\n* azure-pipeline\n* circle-ci\n* jenkins\n\n_Note_: The engine category can be **BUILD**, **DEPLOY**,\n**INSTALL**",
                         "maxLength": 20,
                         "example": "{\n    \"category\": \"BUILD\",\n    \"name\": \"Jenkins\",\n    \"url\": \"some text\"\n}"
+                    },
+                    "platform": {
+                        "description": "The platform that the activity is configured for.\n\nA platform is an evironment such as Windows, Linux, iOS, Android, etc\n\nAn empty value is considered as executable on any platform.  For example\na .PS1 PowerShell script could execute on Winows and Linux. If you always\nexpect to execute on a specific platform then there is no need to supply a value.\n\nThe special value of **\"any\"** is hardcoded into processing.\n\nMinimum suggested values are:\n\n* linux\n* winodws\n* darwin\n\nYou could also qualify further to align with your CI/CD\nsoftware, using such values as:\n\n* Windows-10\n* Windows-11\n* Linux-Redhat\n* Windows-desktop\n \nand so on",
+                        "type": "string"
+                    },
+                    "id": {
+                        "description": "Unique identifier for record",
+                        "maxLength": 40,
+                        "type": "string"
                     }
                 },
                 "example": {
@@ -637,6 +663,8 @@
                 "properties": {
                     "guide": {
                         "description": "Link to documentation on repositories used by this component",
+                        "maxLength": 500,
+                        "minLength": 5,
                         "type": "string",
                         "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/repository.md"
                     },
@@ -645,9 +673,13 @@
                         "description": "Source control version engine.\n\nThis can be used by tools to retreive source code using binary executables.\n\nSome common tools are \"Git\", \"TFS\", \"Mercurial\", \"CVS\".\n\n_Note_: The engine category is **SOURCE** or **CUSTOM**",
                         "example": "Git"
                     },
-                    "artifact": {
-                        "$ref": "#/components/schemas/engine-model",
-                        "description": "Artifact engine\n\nSome common engines are:\n\n* Artifactory\n* Archiva\n\nCI servers can also have their own repository for generated artifact \n\n_Note_: The engine category is **ARTIFACT** or **CUSTOM**\n"
+                    "artifacts": {
+                        "description": "Artifact definition and type\n\nSome common engine namess are:\n\n* Artifactory\n* Archiva (archiva)\n* Docker hub (docker)\n* Nuget\n* PowerShell Gallery\n* Executable (executable)\n* Binary (binary).  For binary objects the extension can give a clue as to type\n\nCI servers can also have their own repository for generated artifact \n\n_Note_: The engine category is **ARTIFACT** or **CUSTOM**\n",
+                        "uniqueItems": true,
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/engine-model"
+                        }
                     }
                 },
                 "example": {
@@ -657,11 +689,18 @@
                         "name": "some text",
                         "url": "some text"
                     },
-                    "artifact": {
-                        "category": "ARTIFACT",
-                        "name": "some text",
-                        "url": "some text"
-                    }
+                    "artifacts": [
+                        {
+                            "category": "CUSTOM",
+                            "name": "some text",
+                            "url": "some text"
+                        },
+                        {
+                            "category": "CUSTOM",
+                            "name": "some text",
+                            "url": "some text"
+                        }
+                    ]
                 }
             },
             "tools-model": {
@@ -671,10 +710,13 @@
                 "properties": {
                     "guide": {
                         "description": "Link to documentation for the tool in the context of this DevOps",
+                        "maxLength": 500,
+                        "minLength": 5,
                         "type": "string",
                         "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/tool.md"
                     },
                     "playbook": {
+                        "description": "Playbook link as URI",
                         "type": "string"
                     },
                     "commands": {
@@ -731,7 +773,7 @@
                 "type": "object",
                 "properties": {
                     "id": {
-                        "description": "An external identifier for this rsource.",
+                        "description": "An external identifier for this resource.",
                         "maxLength": 50,
                         "type": "string"
                     },
@@ -741,6 +783,7 @@
                     },
                     "url": {
                         "description": "An URL to the resource in the asset (CMDB) registry.",
+                        "maxLength": 500,
                         "type": "string"
                     }
                 },
@@ -760,11 +803,13 @@
                 "properties": {
                     "guide": {
                         "description": "Link to documentation for the topic",
+                        "maxLength": 500,
                         "type": "string",
                         "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/deploy.md"
                     },
                     "playbook": {
                         "description": "Playbook parameters",
+                        "maxLength": 500,
                         "type": "string"
                     },
                     "commands": {
@@ -792,6 +837,11 @@
                         "$ref": "#/components/schemas/engine-model",
                         "description": "The processor to understand and execute the commands or playbook.\n\nThe engine category depends on the parent of \nthis model. \n\nFor __test__ it can be:\n\n* COMMAND\n* TEST or\n* CUSTOM",
                         "example": ""
+                    },
+                    "id": {
+                        "description": "Unique identifier for record",
+                        "maxLength": 40,
+                        "type": "string"
                     }
                 },
                 "example": {
@@ -813,80 +863,6 @@
                         "name": "some text",
                         "url": "some text"
                     }
-                }
-            },
-            "commands-model": {
-                "title": "commands",
-                "description": "Commands are executed by the engine.  The commands need to be constructed in a format compatible with the engine. ",
-                "type": "object",
-                "properties": {
-                    "pre": {
-                        "description": "Commands if any that are executed before the script and post items.",
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "script": {
-                        "description": "A single script thais executed after the \"pre\" and before the \"post\" commands.\nThe script can be an URL or a file within the version control (e.g. Git) repository.",
-                        "type": "string"
-                    },
-                    "post": {
-                        "description": "Commands if any that are executed after the script.",
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "example": {
-                    "pre": [
-                        "hostname",
-                        "whoami"
-                    ],
-                    "script": "/deploy/install.sh",
-                    "post": [
-                        "echo Bye Bye"
-                    ]
-                }
-            },
-            "engine-model": {
-                "title": "engine",
-                "description": "Engine details as used for apis, build, testing, configuration and deployment\n\nIf a tool is used and the URL is an input then it is expected that the \ntool will understand the content/format of the input.",
-                "required": [
-                    "category"
-                ],
-                "type": "object",
-                "properties": {
-                    "category": {
-                        "description": "Category of the engine",
-                        "enum": [
-                            "BUILD",
-                            "TEST",
-                            "DEPLOY",
-                            "UNINSTALL",
-                            "SOURCE",
-                            "API",
-                            "CONFIG",
-                            "ARTIFACT",
-                            "COMMAND",
-                            "CUSTOM"
-                        ],
-                        "type": "string"
-                    },
-                    "name": {
-                        "description": "A common name for the tool, such as:\n\n* makefile\n* teamcity\n* azure-pipeline\n\nThe choice is up to you but you should keep it consistent.",
-                        "type": "string"
-                    },
-                    "url": {
-                        "description": "Link to engine or its configuration\n\nThe format of the URL will depend on the engine",
-                        "type": "string"
-                    }
-                },
-                "example": {
-                    "category": "CONFIG",
-                    "name": "some text",
-                    "url": "/asset.conf"
                 }
             },
             "devopsbrief-model": {
@@ -915,6 +891,7 @@
                     },
                     "guide": {
                         "description": "Link to the guide of the devops definition",
+                        "maxLength": 500,
                         "type": "string"
                     },
                     "self": {
@@ -937,6 +914,7 @@
                 "properties": {
                     "guide": {
                         "description": "Link to documentation describing the health check",
+                        "maxLength": 500,
                         "type": "string",
                         "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/health.md"
                     },
@@ -965,17 +943,23 @@
                 "type": "object",
                 "properties": {
                     "status": {
+                        "description": "Error status code, which is not the same as HTTP status code",
                         "type": "string"
                     },
                     "message": {
+                        "description": "Error details",
+                        "maxLength": 300,
+                        "minLength": 10,
                         "type": "string"
                     },
                     "resolution": {
-                        "description": "",
+                        "description": "Resolution instructions for the error situation if these exists.",
                         "type": "string"
                     },
                     "technical": {
                         "description": "Technical information for the error.\n\nThis must not contain sensitive information",
+                        "maxLength": 300,
+                        "minLength": 10,
                         "type": "string"
                     }
                 },
@@ -993,6 +977,7 @@
                 "properties": {
                     "guide": {
                         "description": "Link to documentation on dependencies",
+                        "maxLength": 500,
                         "type": "string",
                         "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/dependency.md"
                     },
@@ -1004,9 +989,11 @@
                         }
                     },
                     "tools": {
+                        "description": "Dependency is not only the APIs or services \nthe asset depends on.  It can also be the \ntools or deployment chain.",
+                        "maxItems": 100,
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/tools-model"
+                            "$ref": "#/components/schemas/deploy-model"
                         }
                     }
                 },
@@ -1014,52 +1001,76 @@
                     "guide": "some text",
                     "apis": [
                         {
-                            "guide": "some text",
+                            "release_id": "some text",
+                            "service_id": "some text",
                             "url": "some text",
                             "format": "Custom",
+                            "guide": "some text",
                             "api": {
-                                "category": "DEPLOY",
+                                "category": "CONFIG",
                                 "name": "some text",
                                 "url": "some text"
-                            }
+                            },
+                            "name": "some text"
                         },
                         {
-                            "guide": "some text",
+                            "release_id": "some text",
+                            "service_id": "some text",
                             "url": "some text",
-                            "format": "AsyncAPI",
+                            "format": "WSDL",
+                            "guide": "some text",
                             "api": {
-                                "category": "API",
+                                "category": "ARTIFACT",
                                 "name": "some text",
                                 "url": "some text"
-                            }
+                            },
+                            "name": "some text"
                         }
                     ],
                     "tools": [
                         {
                             "guide": "some text",
                             "playbook": "some text",
-                            "commands": [
-                                "some text",
-                                "some text"
-                            ],
-                            "tool": {
+                            "commands": {
+                                "pre": [
+                                    "some text",
+                                    "some text"
+                                ],
+                                "script": "some text",
+                                "post": [
+                                    "some text",
+                                    "some text"
+                                ],
+                                "platform": "some text"
+                            },
+                            "deploy": {
                                 "category": "DEPLOY",
                                 "name": "some text",
                                 "url": "some text"
-                            }
+                            },
+                            "id": "some text"
                         },
                         {
                             "guide": "some text",
                             "playbook": "some text",
-                            "commands": [
-                                "some text",
-                                "some text"
-                            ],
-                            "tool": {
-                                "category": "ARTIFACT",
+                            "commands": {
+                                "pre": [
+                                    "some text",
+                                    "some text"
+                                ],
+                                "script": "some text",
+                                "post": [
+                                    "some text",
+                                    "some text"
+                                ],
+                                "platform": "some text"
+                            },
+                            "deploy": {
+                                "category": "CUSTOM",
                                 "name": "some text",
                                 "url": "some text"
-                            }
+                            },
+                            "id": "some text"
                         }
                     ]
                 }
@@ -1071,6 +1082,7 @@
                 "properties": {
                     "url": {
                         "description": "URL for health check path.  The path if supplied must\nmatch a path in the service definition (OpenAPI)\n\nUsing the URL path the details of the health check can\nbe found in the service definition.\n\nNormally a human coud make an intelligent assumption on\nwhat the name of the health check but a machine will find it\nmore difficult.  Also consider how you would identify it \nin a foreign language.",
+                        "maxLength": 500,
                         "type": "string"
                     },
                     "status": {
@@ -1097,11 +1109,6 @@
                 ],
                 "type": "object",
                 "properties": {
-                    "devops_version": {
-                        "description": "**devops** specification version\n\nMajor versions may not be compatible with minor versions.\n\nThis is not the version of the application or source.\n\nThe value here is the OpenAPI version of this specification\nand is not your version of your specifications.  This is analogous\nto the \"openapi\" field in the OpenAPI document.",
-                        "type": "string",
-                        "example": "0.1.34"
-                    },
                     "unique_id": {
                         "description": "Unique identifier \n\nThis is only applicable when the definition is serviced from a catalogue\nthat requires unique identifers.\n\nDo not use the Git repository URL as the unique identifier because\nto retrieve the file you would have to know the location. ",
                         "type": "string",
@@ -1163,7 +1170,7 @@
                     },
                     "repository": {
                         "$ref": "#/components/schemas/repository-model",
-                        "description": "Repository links\n\nRepositories includes:\n\n* Source version control management.  Examples include:\n    - Git\n    - Mercurial\n    - TFS\n* Artefact repositories. Examples include:\n    - Archiva\n    - Artifactory\n* Package managers. Exmaples include:\n    - npm\n    - NuGet\n    - Powershell Gallery\n    - Maven\n    - Apt \n    - Dnf ",
+                        "description": "Repository links\n\nRepositories includes:\n\n* Source version control management.  Examples include:\n    - Git\n    - Mercurial\n    - TFS\n* Artefact repositories. Examples include:\n    - Archiva\n    - Artifactory\n* Package managers. Exmaples include:\n    - npm\n    - NuGet\n    - Powershell Gallery\n    - Maven\n    - Apt \n    - Dnf \n     \nRepositories are managed in forges, such as:\n\n* GitHub\n* Gitlab\n* Gitea\n",
                         "properties": {
                             "guide": {
                                 "type": "string"
@@ -1216,7 +1223,7 @@
                         }
                     },
                     "test": {
-                        "description": "Describes the test process, tools and script",
+                        "description": "Describes the test process, tools and script.\n\nTesting includes verification activities lie code scans, security reviews, code risk analysis, \ntest coverage and other compliance activities.",
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/activity-model"
@@ -1249,44 +1256,12 @@
                             }
                         }
                     },
-                    "install": {
-                        "$ref": "#/components/schemas/deploy-model",
-                        "description": "The Install section gives information on installing the resource onto a server\nfor the first time.  The detection on whether the resource is already\ninstalled is not defined in the specifications.\n\nThe information can be in the form of an Ansibe playbook or commands to \nbe executed on the server.  You can also execute \ncommaonds from a script file that is found on the Git repo.",
-                        "properties": {
-                            "guide": {
-                                "type": "string"
-                            },
-                            "engine": {
-                                "type": "string"
-                            },
-                            "playbook": {
-                                "type": "string"
-                            },
-                            "commands": {
-                                "type": "object",
-                                "properties": {
-                                    "pre": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "script": {
-                                        "type": "string"
-                                    },
-                                    "post": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
                     "refresh": {
-                        "$ref": "#/components/schemas/deploy-model",
                         "description": "The Refresh section gives information on refreshing the resource on the server.  \nThe instructions can be the same as for installing the first time.\n\nThe information can be in the form of a Ansibe playbook or commands to \nbe executed on the server with the component installed.  You can also execute \ncommaonds from a script file that is found on the Git repo.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/deploy-model"
+                        },
                         "properties": {
                             "guide": {
                                 "type": "string"
@@ -1320,8 +1295,11 @@
                         }
                     },
                     "uninstall": {
-                        "$ref": "#/components/schemas/deploy-model",
                         "description": "The Uninstall section gives information on uninstalling the component.\n\nThe information can be in the form of an Ansibe playbook or commands to \nbe executed on the server with the component installed.  You can also execute \ncommaonds from a script file that is found on the Git repo.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/deploy-model"
+                        },
                         "properties": {
                             "guide": {
                                 "type": "string"
@@ -1355,22 +1333,74 @@
                         }
                     },
                     "apis": {
-                        "description": "List of OpenAPI and/or AsyncAPI definitions.\n\nThe list can include Git and REST versions, because before build the API might not be available\nas a REST service.\n\nA resource may have multiple definitions files or even different versions.",
+                        "description": "List of OpenAPI and/or AsyncAPI definitions.\n\nThe list can include Git and REST versions, because before build the API might not be available\nas a REST service.\n\nA resource may have multiple definitions files or even different versions.\n\nThere is also the ability to use WSDL specifications.",
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/api-model"
                         }
                     },
                     "tags": {
-                        "description": "A list of free format tags for the root of the **devops** definition.\n\nThe tags can be used for things such as:\n* identify appication type\n* additional tools applicable",
+                        "description": "A list of free format tags for the root of the **devops** definition.\n\nThe tags can be used for things such as:\n* identify application type\n* additional tools applicable",
                         "type": "array",
                         "items": {
                             "type": "string"
                         }
+                    },
+                    "governance": {
+                        "$ref": "#/components/schemas/governance-model",
+                        "description": "Governance details for the asset described \nby the RediOps definiton."
+                    },
+                    "deploy": {
+                        "description": "The Deploy section gives information on installing the resource onto a server.\nThe detection on whether the resource is already\ninstalled is not defined in the specifications.\n\nThe information can be in the form of an Ansible playbook or commands to \nbe executed on the server.  You can also execute \ncommands from a script file that is found on the Git repo.\n\nThe deploy section can also conain release information and \nactivities.",
+                        "maxItems": 100,
+                        "uniqueItems": false,
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/deploy-model"
+                        },
+                        "properties": {
+                            "guide": {
+                                "type": "string"
+                            },
+                            "engine": {
+                                "type": "string"
+                            },
+                            "playbook": {
+                                "type": "string"
+                            },
+                            "commands": {
+                                "type": "object",
+                                "properties": {
+                                    "pre": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "script": {
+                                        "type": "string"
+                                    },
+                                    "post": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "metadata_url": {
+                        "description": "A URL to additional, custom metadata.\n\nThis metadata in the file, probably in JSON or YAML, format\ncan have any custom schema.  The data in the metadata file\ncan be used by process as required.\n\nOne use case is as template data for generating code,\nconfigurations, scripts or commands.\n\nThe **qaskx-cli** tool is able to parse and use\nJSON, YAML, and YML formatted files as input\ndata to templating.\n\nFor qaskx-cli the URL can be an internet file\nor local file.\n",
+                        "type": "string"
+                    },
+                    "schema": {
+                        "$ref": "#/components/schemas/schema-model",
+                        "description": "The rediOPs schema.\n\nThis includes the version of the schema that\nyour definition represents."
                     }
                 },
                 "example": {
-                    "devops_version": "some text",
+                    "devops_version": "0.1",
                     "unique_id": "some text",
                     "created_on": "2018-02-10T09:30:00Z",
                     "updated_on": "2018-02-10T09:30:00Z",
@@ -1609,6 +1639,7 @@
                 "type": "object",
                 "properties": {
                     "status": {
+                        "maxLength": 50,
                         "type": "string"
                     },
                     "output": {
@@ -1664,10 +1695,12 @@
                 "properties": {
                     "href": {
                         "description": "URL for the resources",
+                        "maxLength": 300,
                         "type": "string"
                     },
                     "rel": {
                         "description": "The relationships for the resource as hypermedia link.\n\nThe common values are:\n\n* self : this resource.  Normally used in lists,\n* first : the first resource in a list, \n* last : the last resource in a list, \n* next : the next resource or page in a list, \n* prev : the previous resource or page in a list\n* parent: the parent resource for the item\n* collection: list of children of the resource\n* buy: link to purchase the investment\n* sell: link to sell the invetsment, assuming the investor has holdings\n* quote: link to quote for the asset\n* icon : URL to the icon for the resource\n* video : URL to a video\n* external : URL to external content\n* content : inline (HTML or markdonw) content related to the resource\n* price : link to resource (product) unit price\n* price+collection : link to list of historical unit prices\n \nThe \"rel\" value is also dependent on context.  There is no prices or ability to buy/sell marketplace itself and therefore these resources will not provide a \"buy\" link for instance.\n\nA buy/sell link are expected to be POST requests and therefore the \"operation\" will need to be considered.  If perdforming a \"POST\" then the caller will need to know the JSON model for the POST, if the media type is \"application/json\" as an example.",
+                        "maxLength": 50,
                         "type": "string"
                     },
                     "operation": {
@@ -1684,10 +1717,12 @@
                     },
                     "media_type": {
                         "description": "The type of resource media type that the link refers to.\n\nExamples are:\n\n* application/json\n* text/html",
+                        "maxLength": 50,
                         "type": "string"
                     },
                     "caption": {
-                        "description": "A caption that can be displaye dfor the link",
+                        "description": "A caption that can be displayed for the link",
+                        "maxLength": 100,
                         "type": "string"
                     }
                 },
@@ -1722,6 +1757,7 @@
                     },
                     "notes": {
                         "description": "Array of notes relevant to current state of health",
+                        "maxItems": 200,
                         "type": "array",
                         "items": {
                             "type": "string"
@@ -1733,6 +1769,7 @@
                     },
                     "description": {
                         "description": "A human-friendly description of the\r\nservice.\r\n",
+                        "maxLength": 500,
                         "type": "string"
                     },
                     "checks": {
@@ -1883,9 +1920,11 @@
                         "type": "string"
                     },
                     "status": {
+                        "maxLength": 50,
                         "type": "string"
                     },
                     "message": {
+                        "maxLength": 500,
                         "type": "string"
                     }
                 },
@@ -1906,7 +1945,7 @@
                 "type": "object",
                 "properties": {
                     "release_id": {
-                        "description": "In well-designed APIs, backwards-compatible\r\nchanges in the service should not update a version number.  APIs\r\nusually change their version number as infrequently as possible, to\r\npreserve stable interface.  However, implementation of an API may\r\nchange much more frequently, which leads to the importance of having\r\nseparate \"release number\" or \"releaseId\" that is different from the\r\npublic version of the API.\r\n\r\nThe release identifier is required for dependencies in recognition\r\nthat under source versioning, the same API may have multiple\r\nversions rercoded - such as in the past and the curent version.\r\n",
+                        "description": "In well-designed APIs, backwards-compatible\r\nchanges in the service should not update a version number.  APIs\r\nusually change their version number as infrequently as possible, to\r\npreserve stable interface.  However, implementation of an API may\r\nchange much more frequently, which leads to the importance of having\r\nseparate \"release number\" or \"releaseId\" that is different from the\r\npublic version of the API.\r\n\r\nThe release identifier is required for dependencies in recognition\r\nthat under source versioning, the same API may have multiple\r\nversions recorded - such as in the past and the curent version.\r\n",
                         "type": "string"
                     },
                     "service_id": {
@@ -1914,7 +1953,7 @@
                         "type": "string"
                     },
                     "url": {
-                        "description": "A full URL for the API specification or if the value is partial\nthen the location is assumed to be on the Git repo.  That is the host name and\nGit name are the same as for the \"devops.json\" file.\n\nIf the resource details are being supplied by a catalogue service\nthen the value in the \"repository\" section will be used.\n\nThis is not the URL for the API implementation as that \nvalue is expected to be stored with the deployment information\nsuch as a CMDB.",
+                        "description": "A full URL for the API specification or if the value is partial\nthen the location is assumed to be on the Git repo.  That is the host name and\nGit name are the same as for the \"devops.json\" file.  The URL should also\naccount for API version.\n\nIf the resource details are being supplied by a catalogue service\nthen the value in the \"repository\" section will be used.\n\nThis is not the URL for the API implementation as that \nvalue is expected to be stored with the deployment information\nsuch as a CMDB.",
                         "maxLength": 500,
                         "type": "string",
                         "example": "/config/openapi.json"
@@ -1932,6 +1971,7 @@
                     },
                     "guide": {
                         "description": "Link to documentation for the topic",
+                        "maxLength": 500,
                         "type": "string",
                         "example": "https://github.com/meerkat-manor/rediOps/blob/main/guide/api.md"
                     },
@@ -1965,16 +2005,153 @@
                 "properties": {
                     "name": {
                         "description": "This is the name of the electronic name used for the contact.\n\nThe names have not been enumerated so as to allow additions and new\nentrants.\n\nFor example Slack might be defined as SLACK.\n\nThe choice of names are set by the consumer, though the recommended names\nfor common contact names are:\n\n* SMS\n* SLACK\n* TWITTER\n* MASTODON\n* MATRIX\n* MSTEAMS\n* JABBER\n* THREADS\n\n_Note_: Uppercase name have been selected to denote these constants",
+                        "maxLength": 100,
                         "type": "string"
                     },
                     "address": {
                         "description": "The electronic address",
+                        "maxLength": 50,
                         "type": "string"
                     }
                 },
                 "example": {
                     "name": "MSTEAMS",
                     "address": "meerkat@merebox.com"
+                }
+            },
+            "governance-model": {
+                "description": "Governance details for the resouce being\ndescribed by the RediOps definition",
+                "type": "object",
+                "properties": {
+                    "data_classification": {
+                        "description": "Rating for data.\n\nThe higher the number the data integrity controls and assurance is required.\nIt is up to the organisation to\nselect their ratings scheme, but it is important it is consistent across all assets.",
+                        "maxLength": 100,
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "availability_rating": {
+                        "description": "Rating for availability.\n\nThe higher the number the more available the asset is.  It is up to the organisation to\nselect their ratings scheme, but it is important it is consistent across all assets.",
+                        "type": "number"
+                    },
+                    "resiliency_rating": {
+                        "description": "Rating for resiliency.\n\nThe higher the number the more resiliant the asset needs to be to failure.  \nIt is up to the organisation to\nselect their ratings scheme, but it is important it is consistent across all assets.",
+                        "type": "number"
+                    },
+                    "cyber_rating": {
+                        "description": "Rating for cyber.\n\nThe higher the number the more cyber controsl are required for the asset.  \nIt is up to the organisation to\nselect their ratings scheme, but it is important it is consistent across all assets.",
+                        "type": "number"
+                    }
+                }
+            },
+            "commands-model": {
+                "title": "commands",
+                "description": "Commands are executed by the engine.  The commands need to be constructed in a format compatible with the engine. ",
+                "type": "object",
+                "properties": {
+                    "pre": {
+                        "description": "Commands if any that are executed before the script and post items.",
+                        "maxItems": 50,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "script": {
+                        "description": "A single script thais executed after the \"pre\" and before the \"post\" commands.\nThe script can be an URL or a file within the version control (e.g. Git) repository.",
+                        "maxLength": 500,
+                        "type": "string"
+                    },
+                    "post": {
+                        "description": "Commands if any that are executed after the script.",
+                        "maxItems": 50,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "platform": {
+                        "description": "The platform that the activity is configured for.\n\nA platform is an evironment such as Windows, Linux, iOS, Android, etc\n\nAn empty value is considered as executable on any platform.  For example\na .PS1 PowerShell script could execute on Winows and Linux. If you always\nexpect to execute on a specific platform then there is no need to supply a value.\n\nThe special value of **\"any\"** is hardcoded into processing.\n\nMinimum suggested values are:\n\n* linux\n* winodws\n* darwin\n\nYou could also qualify further to align with your CI/CD\nsoftware, using such values as:\n\n* Windows-10\n* Windows-11\n* Linux-Redhat\n* Windows-desktop\n \nand so on",
+                        "maxLength": 50,
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "pre": [
+                        "hostname",
+                        "whoami"
+                    ],
+                    "script": "/deploy/install.sh",
+                    "post": [
+                        "echo Bye Bye"
+                    ]
+                }
+            },
+            "engine-model": {
+                "title": "engine",
+                "description": "Engine details as used for apis, build, testing, configuration and deployment\n\nIf a tool is used and the URL is an input then it is expected that the \ntool will understand the content/format of the input.",
+                "required": [
+                    "category"
+                ],
+                "type": "object",
+                "properties": {
+                    "category": {
+                        "description": "Category of the engine\n\nThe category value is dependant on the context\nof the engine model.",
+                        "enum": [
+                            "BUILD",
+                            "TEST",
+                            "VERIFY",
+                            "RELEASE",
+                            "DEPLOY",
+                            "UNINSTALL",
+                            "SOURCE",
+                            "API",
+                            "CONFIG",
+                            "ARTIFACT",
+                            "COMMAND",
+                            "CUSTOM"
+                        ],
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "A common name for the engine or tool, such as:\n\n* make\n* teamcity\n* jenkins\n* Gitlab\n* Bamboo\n* Travis\n* azure-pipeline\n* go-build\n* dotnet\n* docker\n* concourse\n* circle-ci\n* drone-ci\n* woodpecker-ci\n\nThe choice is up to you but you should keep it consistent.\n\nTools such as the **qaskx-cli** will understood some names and be\nable to execute the script or commands.  Please refer to **qaskx-cli**\ndocumentation at https://docs.qaskx.one/qaskx-cli/",
+                        "maxLength": 50,
+                        "minLength": 5,
+                        "type": "string"
+                    },
+                    "url": {
+                        "description": "Link to engine or its configuration\n\nThe format of the URL will depend on the engine.\n\nCommonly the format will be of a URL such that \nit begins with \"https\" but some categories such as \na docket repository does not expect the the \"https\"\nprefix.\n\nAn executable ARTIFACT may also describe a file system\nobject and not a Uniform Resource Locator of the common format.",
+                        "maxLength": 500,
+                        "minLength": 5,
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "category": "BUILD",
+                    "name": "make",
+                    "url": "/src/makefile"
+                }
+            },
+            "schema-model": {
+                "description": "Representaionn of the rediOps schema\nversion and definition link",
+                "required": [
+                    "name",
+                    "version",
+                    "link"
+                ],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "description": "The rediOps schema name",
+                        "type": "string"
+                    },
+                    "version": {
+                        "description": "The rediOps version",
+                        "type": "string"
+                    },
+                    "link": {
+                        "description": "The rediOps schema link for detailed information",
+                        "type": "string"
+                    }
                 }
             }
         },
