@@ -1,0 +1,134 @@
+{
+    "apis": [
+        {
+            "api": {
+                "category": "API",
+                "name": "",
+                "url": ""
+            },
+            "format": "OpenAPI",
+            "guide": "",
+            "release_id": "",
+            "service_id": "",
+            "name": "AService",
+            "url": ""
+        },
+        {
+            "api": {
+                "category": "API",
+                "name": "",
+                "url": ""
+            },
+            "format": "AsyncAPI",
+            "guide": "",
+            "release_id": "",
+            "service_id": "",
+            "name": "BService",
+            "url": ""
+        }
+    ],
+    "asset": {
+        "id": "b6775b43-659d-4426-b012-3226a7cfdd56",
+        "name": "",
+        "url": ""
+    },
+    "build": [
+        {
+            "activity": {
+                "category": "BUILD",
+                "name": "Lint",
+                "url": ""
+            },
+            "config": "",
+            "guide": ""
+        },
+        {
+            "activity": {
+                "category": "BUILD",
+                "name": "Compile",
+                "url": ""
+            },
+            "config": "",
+            "guide": ""
+        }
+    ],
+    "created_on": "2023-07-09T07:05:38.8634596+10:00",
+    "dependency": {
+        "apis": [
+            {
+                "api": {
+                    "category": "API",
+                    "name": "",
+                    "url": ""
+                },
+                "format": "OpenAPI",
+                "guide": "",
+                "release_id": "v1",
+                "service_id": "Customer.Details.CI00001",
+                "url": ""
+            }
+        ],
+        "guide": "",
+        "tools": [
+            {
+                "commands": null,
+                "guide": "",
+                "playbook": "",
+                "tool": {
+                    "category": "CUSTOM",
+                    "name": "",
+                    "url": ""
+                }
+            }
+        ]
+    },
+    "devops_version": "0.0.1",
+    "guide": "",
+    "install": {
+        "commands": {
+            "script": ""
+        },
+        "deploy": {
+            "category": "DEPLOY",
+            "name": "rpm",
+            "url": ""
+        },
+        "guide": "",
+        "playbook": ""
+    },
+    "name": "Wardrobe",
+    "organisation": "Witch & Wardrobe",
+    "owner": {
+        "email": "",
+        "matrix": "",
+        "name": "",
+        "slack": "",
+        "twitter": "",
+        "web": ""
+    },
+    "tags": [
+        ""
+    ],
+    "test": [
+        {
+            "activity": {
+                "category": "TEST",
+                "name": "",
+                "url": ""
+            },
+            "config": "",
+            "guide": ""
+        },
+        {
+            "activity": {
+                "category": "TEST",
+                "name": "LoadRunner",
+                "url": ""
+            },
+            "config": "",
+            "guide": ""
+        }
+    ],
+    "unique_id": "48913292-dc8a-4fb6-99cd-c22ab445e0ee",
+    "updated_on": "2023-07-09T07:05:38.8634596+10:00"
+}

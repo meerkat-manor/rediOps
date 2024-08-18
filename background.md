@@ -1,9 +1,4 @@
+# Background
 
+_This document is under construction_
 
-
-```mermaid
-
-mindmaps
-    
-
-```
